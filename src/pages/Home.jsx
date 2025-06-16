@@ -17,7 +17,7 @@ function Home() {
         <ul className="glass-projects-list">
           <li>
             <span className="glass-project-name">Reston</span>
-            <span className="glass-project-desc">Voice AI that helps therapy-goers have better sessions</span>
+            <span className="glass-project-desc">Voice AI that helps therapy-goers have better sessions through work outside of sessions</span>
           </li>
           <li>
             <span className="glass-project-name">Memi</span>
