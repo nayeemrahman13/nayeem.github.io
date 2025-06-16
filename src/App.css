@@ -185,4 +185,23 @@ body {
   .glass-title {
     font-size: 2em;
   }
+  .logo-container {
+    width: 36px;
+    height: 36px;
+    margin-right: 0.7rem;
+    padding: 0.1rem;
+  }
+}
+
+.logo-container {
+  width: 48px;
+  height: 48px;
+  background: #fff;
+  border-radius: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1.2rem;
+  box-shadow: none;
+  padding: 0.25rem;
 }
