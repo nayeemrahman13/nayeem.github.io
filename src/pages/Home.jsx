@@ -16,12 +16,12 @@ function Home() {
         <h2>Projects</h2>
         <ul className="glass-projects-list">
           <li>
-            <span className="glass-project-name">Reston</span>
+            <a href="https://reston-nayeemrahman13.replit.app/" className="glass-project-name">Reston</a>
             <span className="glass-project-desc">Voice AI that helps therapy-goers have better sessions through work outside of sessions</span>
           </li>
           <li>
-            <span className="glass-project-name">Memi</span>
-            <span className="glass-project-desc">Digital time capsules for your most important moments</span>
+            <a href="https://regal-voice-ai-agent-nayeemrahman13.replit.app/" className="glass-project-name">Voice AI agent</a>
+            <span className="glass-project-desc">A customer support agent that can speak like Yoda (Easter egg)</span>
           </li>
           <li>
             <span className="glass-project-name">Resume Agent</span>
@@ -51,6 +51,7 @@ function Home() {
         <p>Want to collaborate or just say hi? I'm always up for a chat!</p>
         <a href="mailto:nayeemr613@gmail.com" className="glass-cta glass-cta-secondary">Email Me</a>
       </section>
+      <elevenlabs-convai agent-id="agent_6401k1bc5tp8f3rsfjng67q7f88t"></elevenlabs-convai><script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
     </div>
   );
 }
