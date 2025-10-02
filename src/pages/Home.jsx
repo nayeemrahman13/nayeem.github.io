@@ -30,7 +30,7 @@ function Home() {
         </ul>
       </section>
       <section className="glass-section glass-photos-section" id="photos">
-        <h2>Photos</h2>
+        <h2>Photos (Coming Soon)</h2>
         <ul className="glass-projects-list">
           <li>
             <span className="glass-project-name">Japan</span>
