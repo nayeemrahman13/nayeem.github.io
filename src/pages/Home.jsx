@@ -9,7 +9,7 @@ function Home() {
       <section className="glass-section glass-about-section" id="about">
         <h2>About Me</h2>
         <p>
-          I'm Nayeem. I like building things that focus on memories and connection.
+          I'm Nayeem. I like building things that focus on memories and connection. I do this through code and photography.
         </p>
       </section>
       <section className="glass-section glass-projects-section" id="projects">
