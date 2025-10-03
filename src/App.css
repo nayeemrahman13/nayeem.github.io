@@ -1,10 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 body {
   margin: 0;
   background: linear-gradient(120deg, #e0e7ef 0%, #f5f6fa 100%);
   color: #222;
   font-family: 'Nunito', 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .app-container {
@@ -177,20 +180,318 @@ body {
   margin-left: 1.2em;
 }
 
-@media (max-width: 700px) {
+/* Modern Mobile Navigation */
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.mobile-menu-button {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  gap: 0.25rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger-line {
+  width: 1.5rem;
+  height: 2px;
+  background: #222;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger-line.active:nth-child(1) {
+  transform: rotate(45deg) translate(0.3rem, 0.3rem);
+}
+
+.hamburger-line.active:nth-child(2) {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.hamburger-line.active:nth-child(3) {
+  transform: rotate(-45deg) translate(0.3rem, -0.3rem);
+}
+
+.mobile-nav-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  opacity: 0;
+  transform: translateY(-1rem);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.mobile-nav-menu.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobile-nav-content {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: #222;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1em;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
+  outline: none;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none; /* Hide desktop nav on mobile */
+  }
+
+  .mobile-menu-button {
+    display: flex; /* Show hamburger on mobile */
+  }
+
+  .glass-navbar {
+    position: relative; /* For absolute positioning of mobile menu */
+  }
+
+  .glass-navbar-inner {
+    justify-content: space-between; /* Logo left, hamburger right */
+    padding: 0.7rem 1rem;
+  }
+
+  .logo-container {
+    margin-right: 0;
+  }
+
+  /* Mobile Layout */
+  .glass-basic-bg {
+    padding: 2rem 0 1rem 0;
+  }
+
   .glass-section {
     padding: 1.5rem 1rem 1.2rem 1rem;
-    max-width: 98vw;
+    max-width: calc(100vw - 2rem);
+    margin: 0 auto 1.5rem auto;
+    border-radius: 20px;
   }
+
+  .glass-hero-section {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    text-align: center;
+  }
+
   .glass-title {
-    font-size: 2em;
+    font-size: 1.8em;
+    line-height: 1.2;
   }
+
+  .glass-tagline {
+    font-size: 1.1em;
+    margin-bottom: 1.2em;
+  }
+
+  .glass-cta {
+    padding: 0.8em 1.8em;
+    font-size: 1em;
+    border-radius: 16px;
+  }
+
+  .glass-section h2 {
+    font-size: 1.3em;
+    margin-bottom: 0.8em;
+  }
+
+  .glass-section p {
+    font-size: 1em;
+    line-height: 1.7;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  /* Enhanced mobile typography */
+  .glass-title {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .glass-tagline {
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .glass-section h2 {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .glass-nav-link {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .glass-project-name {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .glass-project-desc {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Mobile Projects Layout */
+  .glass-projects-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.2em 0;
+  }
+
+  .glass-project-name {
+    font-size: 1.1em;
+  }
+
+  .glass-project-desc {
+    font-size: 1em;
+    margin-left: 0;
+    opacity: 0.9;
+  }
+
   .logo-container {
     width: 36px;
     height: 36px;
     margin-right: 0.7rem;
     padding: 0.1rem;
   }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .glass-navbar-inner {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .mobile-nav-content {
+    padding: 1rem;
+  }
+
+  .mobile-nav-link {
+    padding: 0.875rem 1.25rem;
+    font-size: 1em;
+  }
+
+  .hamburger-line {
+    width: 1.25rem;
+  }
+
+  .glass-section {
+    padding: 1.2rem 0.8rem 1rem 0.8rem;
+    max-width: calc(100vw - 1.6rem);
+  }
+
+  .glass-title {
+    font-size: 1.6em;
+  }
+
+  .glass-tagline {
+    font-size: 1em;
+  }
+
+  .glass-cta {
+    padding: 0.7em 1.5em;
+    font-size: 0.95em;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .glass-nav-link,
+  .glass-cta,
+  .glass-project-name {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .glass-projects-list li {
+    padding: 1.5em 0;
+  }
+
+  /* Remove hover effects on touch devices */
+  .glass-nav-link:hover,
+  .glass-cta:hover {
+    background: none;
+    transform: none;
+  }
+
+  /* Add active states for touch feedback */
+  .glass-nav-link:active,
+  .glass-cta:active {
+    background: rgba(0,122,255,0.1);
+    transform: scale(0.98);
+  }
+}
+
+/* Performance optimizations for mobile */
+.glass-navbar,
+.glass-section {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce motion for better performance */
+@media (prefers-reduced-motion: reduce) {
+  .glass-navbar,
+  .glass-section,
+  .glass-nav-link,
+  .glass-cta {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Optimize scrolling performance */
+.glass-basic-bg {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .logo-container {

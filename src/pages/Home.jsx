@@ -4,7 +4,7 @@ function Home() {
       <section className="glass-section glass-hero-section" id="home">
         <h1 className="glass-title">Nayeem Rahman</h1>
         <p className="glass-tagline">Tinkerer and product manager.</p>
-        <a href="#projects" className="glass-cta">See My Work</a>
+        <a href="#projects" className="glass-cta" onClick={(e) => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }); }}>See My Work</a>
       </section>
       <section className="glass-section glass-about-section" id="about">
         <h2>About Me</h2>
