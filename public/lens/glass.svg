@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="435" height="435" fill="none" viewBox="0 0 435 435">
+  <defs>
+    <filter id="lensGlassGlow" x="0" y="0" width="434.2" height="434.2" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+      <feOffset/>
+      <feGaussianBlur stdDeviation="6.5"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0.4625 0 0 0 0 0.4625 0 0 0 1 0"/>
+      <feBlend in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+  <g filter="url(#lensGlassGlow)">
+    <path d="m219.4 420.4c111.4 0 201.5-90.9 201.5-203.4s-90.2-205.5-201.5-205.5c-111.4 0-201.4 92.9-201.4 205.5s90 203.4 201.4 203.4z" stroke="#DAD3C1" stroke-miterlimit="10" stroke-width="1.5"/>
+    <path d="m21.2 219.5c0-109 88.2-197.5 196.8-197.5 13.8 0 27.2 1.5 40.2 4.2-10.6-1.6-21.3-2.6-32.4-2.6-108.8 0-197 88.6-197 197.6v1.8c-7.4-5.6-7.6 13.7-7.6-3.5z" fill="#fff"/>
+    <path d="m410.9 214c0 109-88.2 197.5-196.9 197.5-13.8 0-27.2-1.5-40.2-4.2 10.5 1.6 21.3 2.6 32.4 2.6 108.8 0 197-88.6 197-197.6v-1.8c7.2 6 7.7-13.7 7.7 3.5z" fill="#fff"/>
+    <path d="m159.6 27.7c-79.4 22.5-138.9 95.6-138.2 181.7 0 4.6 0.2 9.2 0.5 13.7-2.9-91.1 56.6-169.8 139.2-195.1l-1.5-0.3z" fill="#fff"/>
+    <path d="m285.8 400.6c79.4-22.3 138.9-95.4 138.2-181.5 0-4.6-0.2-9.1-0.5-13.7 2.9 91.1-56.6 169.8-139.2 195.1l1.5 0.1z" fill="#fff"/>
+    <path d="m395.7 255.6c-18.7 78.7-85.6 138.6-170.3 142.7-4.6 0.2-9.1 0.3-13.7 0.2 91.1 2 167.8-59.4 184.5-141.8l-0.5-1.1z" fill="#fff"/>
+    <path d="m35.7 185.1c18.7-78.7 85.6-138.6 170.3-142.7 4.6-0.2 9.1-0.3 13.7-0.2-91.1-2.1-167.8 59.4-184.5 141.8l0.5 1.1z" fill="#fff"/>
+  </g>
+</svg>
