@@ -1,42 +1,63 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Barrel from './Barrel';
+import FilmStrip from './FilmStrip';
 import IndexMark from './IndexMark';
 import Viewfinder from './Viewfinder';
-import { CSS_VARS } from './geometry';
+import { framesForStop } from './content';
+import { CSS_VARS, polar } from './geometry';
+import { SHUTTER_SPRING, useSpring } from './motion';
 import { STOPS } from './stops';
 import { useZoomRing } from './useZoomRing';
 
-const IRIS_MS = 220;
 const ELEVENLABS_AGENT = 'agent_6401k1bc5tp8f3rsfjng67q7f88t';
+const BLADE_COUNT = 8;
+// The aperture is the hole, not the blades: an opaque ring with a polygonal
+// opening punched through it. Swinging eight separate leaves looks convincing
+// only if they never cross the opening, which is fiddly and fragile; growing
+// the hole gives an exact edge at every value and cannot smear the card.
+const IRIS_OUTER = 53;
+const IRIS_MIN_HOLE = 1.5;
+const IRIS_MAX_HOLE = 47;
+// Real diaphragms rotate as they travel, so the opening twists shut.
+const IRIS_TWIST = 20;
+const BLADE_SWEEP = 26;
+// A press shorter than this is read as a tap, which latches the shutter open
+// so the revealed card can actually be clicked.
+const TAP_MS = 220;
 
-function IrisBlades({ closed }) {
-  const blades = Array.from({ length: 8 }, (_, index) => (
-    <path
-      key={index}
-      className="iris-blade"
-      d="M50 50 L47 8 Q68 16 78 36 Z"
-      transform={`rotate(${index * 45} 50 50)`}
-    />
-  ));
-
-  return (
-    <svg className="iris-blades" viewBox="0 0 100 100" aria-hidden="true" data-closed={closed}>
-      {blades}
-    </svg>
-  );
+function irisHole(aperture) {
+  return IRIS_MIN_HOLE + aperture * (IRIS_MAX_HOLE - IRIS_MIN_HOLE);
 }
 
-function OptionalArt({ className, src, onReady }) {
-  const [visible, setVisible] = useState(true);
-  if (!visible) return null;
+function Iris({ aperture }) {
+  const hole = irisHole(aperture);
+  const twist = -IRIS_TWIST * (1 - aperture);
+  const angleAt = (index) => twist + (index * 360) / BLADE_COUNT;
+  const inner = (index) => polar(angleAt(index), hole);
+  // Swept back from its own inner corner, which is what gives a diaphragm its
+  // pinwheel rather than a plain starburst.
+  const outer = (index) => polar(angleAt(index) + BLADE_SWEEP, IRIS_OUTER);
+
+  const vertices = Array.from({ length: BLADE_COUNT }, (_, i) => inner(i));
+  const opening = `M ${vertices
+    .map((v) => `${v.x.toFixed(2)} ${v.y.toFixed(2)}`)
+    .join(' L ')} Z`;
+
   return (
-    <img
-      className={className}
-      src={src}
-      alt=""
-      onLoad={() => onReady?.()}
-      onError={() => setVisible(false)}
-    />
+    <svg className="iris-blades" viewBox="0 0 100 100" aria-hidden="true">
+      {Array.from({ length: BLADE_COUNT }, (_, i) => {
+        const next = (i + 1) % BLADE_COUNT;
+        // Neighbours share the inner-to-outer edge, so the leaves tile with no
+        // seams to leak light through at any aperture.
+        const points = [inner(i), inner(next), outer(next), outer(i)]
+          .map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`)
+          .join(' ');
+        return (
+          <polygon key={i} className="iris-blade" data-parity={i % 2} points={points} />
+        );
+      })}
+      <path className="iris-edge" d={opening} />
+    </svg>
   );
 }
 
@@ -52,24 +73,54 @@ export default function LensInstrument() {
     selectStop,
     lensProps,
   } = useZoomRing();
-  const [contentStop, setContentStop] = useState(activeStop);
-  const [irisClosed, setIrisClosed] = useState(false);
+
+  const [frameIndex, setFrameIndex] = useState(0);
+  const [held, setHeld] = useState(false);
+  const [latched, setLatched] = useState(false);
+  const pressRef = useRef(0);
+
+  const frames = framesForStop(activeStop.id);
+  const frame = frames[Math.min(frameIndex, frames.length - 1)] ?? frames[0];
+  const open = held || latched;
+
+  const [aperture, setAperture, jumpAperture] = useSpring(0, SHUTTER_SPRING);
 
   useEffect(() => {
-    if (contentStop.id === activeStop.id) return undefined;
     if (reduceMotion) {
-      setContentStop(activeStop);
-      setIrisClosed(false);
-      return undefined;
+      jumpAperture(open ? 1 : 0);
+      return;
     }
+    setAperture(open ? 1 : 0);
+  }, [open, reduceMotion, setAperture, jumpAperture]);
 
-    setIrisClosed(true);
-    const timer = window.setTimeout(() => {
-      setContentStop(activeStop);
-      setIrisClosed(false);
-    }, IRIS_MS);
-    return () => window.clearTimeout(timer);
-  }, [activeStop, contentStop.id, reduceMotion]);
+  // A new section loads a new roll, so start at its first frame with the
+  // shutter shut rather than leaving the previous card exposed.
+  useEffect(() => {
+    setFrameIndex(0);
+    setLatched(false);
+    setHeld(false);
+  }, [activeStop.id]);
+
+  const onShutterPointerDown = useCallback((event) => {
+    if (event.button !== 0 && event.pointerType === 'mouse') return;
+    if (event.target.closest('.finder-action')) return;
+    pressRef.current = performance.now();
+    setHeld(true);
+  }, []);
+
+  const onShutterPointerUp = useCallback((event) => {
+    if (event.target.closest('.finder-action')) return;
+    const quick = performance.now() - pressRef.current < TAP_MS;
+    setHeld(false);
+    if (quick) setLatched((value) => !value);
+  }, []);
+
+  const onShutterKeyDown = useCallback((event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    event.stopPropagation();
+    setLatched((value) => !value);
+  }, []);
 
   return (
     <div className="stage">
@@ -84,35 +135,66 @@ export default function LensInstrument() {
         ))}
       </nav>
 
-      <div
-        className="lens"
-        ref={lensRef}
-        style={CSS_VARS}
-        data-dragging={dragging}
-        aria-label="Zoom ring. Use arrow keys or drag to choose a topic."
-        {...lensProps}
-        onPointerDown={(event) => {
-          if (event.target.closest('.viewfinder')) return;
-          lensProps.onPointerDown(event);
-        }}
-      >
-        <div className="barrel" style={{ transform: `rotate(${rotation}deg)` }}>
-          <Barrel liveStop={liveStop} selectStop={selectStop} didDragRef={didDragRef} />
-        </div>
-        <OptionalArt className="glass-art" src="/lens/glass.svg" />
+      <div className="instrument" style={CSS_VARS}>
+        <FilmStrip
+          stop={activeStop}
+          frames={frames}
+          index={Math.min(frameIndex, frames.length - 1)}
+          onIndexChange={setFrameIndex}
+        />
 
-        <div className="viewfinder">
-          <Viewfinder stop={contentStop} />
-          <div className="iris" data-closed={irisClosed} aria-hidden="true">
-            <IrisBlades closed={irisClosed} />
-            <OptionalArt className="iris-art" src="/lens/iris.svg" />
+        <div
+          className="lens"
+          ref={lensRef}
+          data-dragging={dragging}
+          aria-label="Zoom ring. Use arrow keys or drag to choose a topic."
+          {...lensProps}
+          onPointerDown={(event) => {
+            if (event.target.closest('.viewfinder')) return;
+            lensProps.onPointerDown(event);
+          }}
+        >
+          <div className="barrel" style={{ transform: `rotate(${rotation}deg)` }}>
+            <Barrel liveStop={liveStop} selectStop={selectStop} didDragRef={didDragRef} />
           </div>
-        </div>
+          <img className="glass-art" src="/lens/glass.svg" alt="" />
 
-        <IndexMark />
+          <div
+            className="viewfinder"
+            style={{
+              '--aperture': aperture.toFixed(4),
+              // Kept in lockstep with the drawn opening so the card is
+              // revealed exactly through the hole, never beyond its edge.
+              '--iris-hole': `${irisHole(aperture).toFixed(2)}%`,
+            }}
+            data-open={open}
+            role="button"
+            tabIndex={0}
+            aria-expanded={open}
+            aria-label={`Shutter. Hold or press to reveal ${frame.title}.`}
+            onPointerDown={onShutterPointerDown}
+            onPointerUp={onShutterPointerUp}
+            onPointerCancel={() => setHeld(false)}
+            onPointerLeave={() => setHeld(false)}
+            onKeyDown={onShutterKeyDown}
+          >
+            <Viewfinder stop={activeStop} frame={frame} interactive={latched} />
+
+            <p className="shutter-hint" aria-hidden="true">
+              <span className="shutter-hint-frame">{frame.caption}</span>
+              <span className="shutter-hint-verb">hold to expose</span>
+            </p>
+
+            <div className="iris" aria-hidden="true">
+              <Iris aperture={aperture} />
+            </div>
+          </div>
+
+          <IndexMark />
+        </div>
       </div>
 
-      {contentStop.id === 'contact' ? (
+      {activeStop.id === 'contact' ? (
         <elevenlabs-convai agent-id={ELEVENLABS_AGENT} />
       ) : null}
     </div>

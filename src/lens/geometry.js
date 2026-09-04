@@ -81,10 +81,41 @@ function gradientStop(radius) {
 // in here so it can never be clipped by the round edge, however far it scrolls.
 const SQUARE_SIZE = 1 / Math.SQRT2;
 
+// Film placement, as fractions of the lens diameter so the strip scales with
+// the barrel. FILM.gate sits just outside R.rim, which is what makes the film
+// read as fed through the lens rather than parked beside it; FILM.tuck starts
+// the stock well inside the rim so the barrel hides where it begins.
+export const FILM = {
+  height: 0.235,
+  frameWidth: 0.26,
+  frameGap: 0.014,
+  // Just inside the rim, so the leading frame is clipped by the barrel and the
+  // film reads as fed through the lens instead of parked beside it.
+  gate: R.rim / VIEWBOX - 0.012,
+  tuck: 0.26,
+};
+
+// A lens with a strip flying off one side reads as lopsided, so the instrument
+// is shifted left by half of however far the exposed frames reach past the rim.
+// That balances the pair as one composition while the bare stock still runs on
+// past them, keeping the roll's sense of continuing.
+const VISIBLE_FRAMES = 3;
+export const FILM_RUN =
+  FILM.gate +
+  VISIBLE_FRAMES * FILM.frameWidth +
+  (VISIBLE_FRAMES - 1) * FILM.frameGap -
+  R.rim / VIEWBOX;
+
 export const CSS_VARS = {
   '--hole-inset': insetPercent(R.hole),
   '--rim-mask-inner': gradientStop(R.bandOuter),
   '--rim-mask-outer': gradientStop(R.rim),
   '--panel-inset': `${(((1 - SQUARE_SIZE) / 2) * 100).toFixed(3)}%`,
   '--panel-size': `${(SQUARE_SIZE * 100).toFixed(3)}%`,
+  '--film-h': FILM.height,
+  '--film-frame-w': FILM.frameWidth,
+  '--film-frame-gap': FILM.frameGap,
+  '--film-gate': FILM.gate.toFixed(4),
+  '--film-tuck': FILM.tuck,
+  '--film-run': FILM_RUN.toFixed(4),
 };

@@ -1,0 +1,30 @@
+<!-- viewBox is a deliberate 3:2 window over the generated artwork so the film
+     frame crops to the mesa stack and desert floor rather than clipping their
+     bases. The sun is repositioned into that window. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 46.7 140 93.3">
+<!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
+  <rect x="0" y="0" width="140" height="140" fill="#1C1915"/>
+  <style type="text/css">.cls-0 {
+    fill: #0D0E10
+    }
+.cls-1 {
+    fill: #282B2F
+    }
+.cls-2 {
+    fill: #933C02
+    }
+.cls-3 {
+    fill: #BC8043
+    }
+.cls-4 {
+    fill: #B05715
+    }
+.cls-5 {
+    fill: #E3D8BE
+    }</style>
+  <circle class="cls-5" cx="117" cy="61" r="11.4"/>
+  <polygon class="cls-1" points="122.3 77.3 122.3 69.6 27.9 69.6 27.9 140 140 140 140 77.3"/>
+  <polygon class="cls-2" points="136.9 104.6 136.9 93.2 133.8 92.6 133.8 81.3 93.6 81.3 93.6 89.1 90.8 89.8 90.8 102.3 86.9 103.4 86.9 140 140 140 140 105.8"/>
+  <polygon class="cls-3" points="76.3 103.2 76.3 88.7 68.6 87.3 68.6 58.6 65.9 58.2 65.9 50.3 0 50.3 0 140 96.7 140 96.7 114.2"/>
+  <rect class="cls-4" y="120.9" width="140" height="19.1"/>
+</svg>

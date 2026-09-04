@@ -1,0 +1,10 @@
+<!-- viewBox is a deliberate 3:2 window over the generated artwork so the film
+     frame crops to sky, headland, water, and rock shelf. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 8 40 26.7">
+<!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
+  <rect x="0" y="0" width="40" height="40" fill="#1C1915"/>
+  <path d="m40 0h-40v40h40v-40z" fill="#7D96A1"/>
+  <path d="m40 10.52s-3.84-1.02-8.53-1.02c-8.42 0-17.53 5.86-18.04 8.5h26.57v-7.48z" fill="#244741"/>
+  <path d="m0 18v3.26l21.17 6.88 2.17 3.51 7.91 3.34 3.43 5.01h5.32v-22h-40z" fill="#3F746B"/>
+  <path d="m31.25 34.99-7.91-3.34-2.17-3.51-21.17-7.32v19.18h34.68l-3.43-5.01z" fill="#242629"/>
+</svg>

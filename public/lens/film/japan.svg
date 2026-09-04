@@ -1,0 +1,30 @@
+<!-- viewBox is a deliberate 3:2 window over the generated artwork so the film
+     frame crops to sun, ridges, and shoreline rather than empty sky. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 70 512 341">
+<!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
+  <rect x="0" y="0" width="512" height="512" fill="#1C1915"/>
+  <style type="text/css">.cls-0 {
+    fill: #111213
+    }
+.cls-1 {
+    fill: #457068
+    }
+.cls-2 {
+    fill: #234140
+    }
+.cls-3 {
+    fill: #18302E
+    }
+.cls-4 {
+    fill: #CD8C47
+    }
+.cls-5 {
+    fill: #DED2B9
+    }</style>
+  <rect class="cls-1" y="394" width="512" height="118"/>
+  <polygon class="cls-2" points="0 366 0 196 130 112 317 211 354 199.5 512 297.5 512 366"/>
+  <polygon class="cls-1" points="0 329 238 223 366.5 278 366.5 366 0 366"/>
+  <polygon class="cls-3" points="512 323 405.5 266 106.7 366 512 366"/>
+  <rect class="cls-4" y="366" width="512" height="32"/>
+  <circle class="cls-5" cx="398.2" cy="102.7" r="71.7"/>
+</svg>

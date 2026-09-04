@@ -4,7 +4,8 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  // 'docs' is the Vite outDir, so it holds compiled bundles, not source.
+  { ignores: ['dist', 'docs'] },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {

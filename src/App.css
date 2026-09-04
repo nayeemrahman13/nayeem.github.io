@@ -41,15 +41,41 @@
 }
 
 .stage {
+  --lens-size: min(78vmin, 40rem);
   min-height: 100svh;
   display: grid;
   place-items: center;
   padding: 3.25rem 1.25rem 2rem;
+  /* The film runs off the right edge on purpose; it should read as a roll
+     that continues rather than a strip that happens to end. */
+  overflow-x: clip;
+}
+
+/* Holds the lens and the film in one coordinate space so the film throat can
+   be placed against the barrel rim. The film is positioned from the lens
+   centre, so rather than widen this box we slide the whole instrument left by
+   half the film's reach, which centres the lens and film as one composition
+   without disturbing any of the geometry between them. */
+.instrument {
+  /* --film-run arrives as an inline style, so the offset has to be derived
+     here rather than on .stage, where it is not in scope. Half the film's
+     reach, but never more than the slack beside the barrel, so a viewport wide
+     enough to stay side-by-side yet too narrow to absorb the offset shifts
+     less instead of pushing the lens off-screen. */
+  --film-shift: min(
+    calc(var(--lens-size) * var(--film-run) / 2),
+    max(0px, calc((100vw - 2.5rem - var(--lens-size)) / 2))
+  );
+  position: relative;
+  width: var(--lens-size);
+  aspect-ratio: 1;
+  transform: translateX(calc(var(--film-shift) * -1));
 }
 
 .lens {
   position: relative;
-  width: min(78vmin, 40rem);
+  z-index: 2;
+  width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
   touch-action: none;
@@ -153,8 +179,7 @@
   fill: var(--paper);
 }
 
-.glass-art,
-.iris-art {
+.glass-art {
   object-fit: contain;
 }
 
@@ -172,17 +197,34 @@
   );
 }
 
+/* The shutter. Closed at rest, so this is a dark disc until it is pressed. */
 .viewfinder {
   position: absolute;
   inset: var(--hole-inset, 22.9%);
   z-index: 2;
   overflow: hidden;
   border-radius: 50%;
-  background: var(--paper);
+  background: #0d0c0b;
   color: var(--ink);
   box-shadow: inset 0 0 0 1px rgba(28, 25, 21, 0.16);
-  cursor: auto;
-  touch-action: pan-y;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viewfinder:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: -4px;
+}
+
+/* The paper only exists where the aperture has opened, so the card is
+   genuinely revealed through the blades instead of fading in over them. */
+.viewfinder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  clip-path: circle(var(--iris-hole, 0%) at 50% 50%);
 }
 
 .viewfinder-panel {
@@ -191,20 +233,91 @@
   left: var(--panel-inset);
   width: var(--panel-size);
   height: var(--panel-size);
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    #000 5%,
-    #000 95%,
-    transparent 100%
-  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* Held back until the opening is wide enough to read through, so the words
+     are never caught behind a closing blade edge. */
+  opacity: calc((var(--aperture, 0) - 0.42) * 2.6);
 }
 
-.viewfinder-panel::-webkit-scrollbar {
-  display: none;
+.finder-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.05rem, 3.4vmin, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.viewfinder-panel[data-frame='name'] .finder-title {
+  font-size: clamp(1.7rem, 6vmin, 3.4rem);
+  letter-spacing: -0.05em;
+  line-height: 0.88;
+}
+
+.viewfinder-panel[data-frame='name'] .finder-title span {
+  display: block;
+}
+
+.finder-line {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(0.82rem, 2.1vmin, 1rem);
+  line-height: 1.4;
+}
+
+.finder-action {
+  margin-top: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: clamp(0.8rem, 2vmin, 0.95rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  word-break: break-word;
+  transition: color 160ms ease, transform 160ms var(--ease-out);
+}
+
+.finder-action::after {
+  content: '↗';
+  font-size: 0.78em;
+}
+
+.finder-action:active {
+  transform: scale(0.97);
+}
+
+/* Wayfinding for the closed state: which frame is loaded, and that the
+   shutter is the thing to press. Fades out as the blades open. */
+.shutter-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  pointer-events: none;
+  opacity: calc(1 - var(--aperture, 0) * 1.6);
+}
+
+.shutter-hint-frame {
+  font-size: clamp(0.85rem, 2.4vmin, 1.1rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+.shutter-hint-verb {
+  font-size: clamp(0.6rem, 1.5vmin, 0.72rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(240, 236, 227, 0.42);
 }
 
 .iris {
@@ -212,162 +325,163 @@
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  display: grid;
-  place-items: center;
-  background: #0d0c0b;
-  clip-path: circle(0% at 50% 50%);
-  transition: clip-path 220ms var(--ease-out);
 }
 
-.iris[data-closed='true'] {
-  clip-path: circle(52% at 50% 50%);
-}
-
-.iris-blades,
-.iris-art {
+.iris-blades {
   width: 100%;
   height: 100%;
 }
 
+/* Alternating shades so the closed rosette reads as overlapping metal leaves
+   instead of one flat black disc. */
 .iris-blade {
-  fill: #161311;
-  stroke: #3a332c;
+  stroke: rgba(224, 216, 196, 0.07);
   stroke-width: 0.4;
 }
 
-.finder-rest,
-.finder-copy {
-  min-height: 100%;
+.iris-blade[data-parity='0'] {
+  fill: #1a1714;
+}
+
+.iris-blade[data-parity='1'] {
+  fill: #141210;
+}
+
+/* The lit edge of the opening, where the coating catches light. */
+.iris-edge {
+  fill: none;
+  stroke: rgba(224, 216, 196, 0.26);
+  stroke-width: 0.5;
+}
+
+/* ---- Film strip ---------------------------------------------------------
+   Sits behind the lens so the barrel hides where the stock begins. All
+   horizontal placement is a fraction of the lens diameter. */
+.film {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 100%;
+  height: calc(var(--lens-size) * var(--film-h));
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.film-stock {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--lens-size) * var(--film-tuck));
+  width: calc(var(--lens-size) * 2);
+  background-image: url('/lens/film/stock.svg');
+  background-repeat: repeat-x;
+  background-size: calc(var(--lens-size) * (var(--film-frame-w) + var(--film-frame-gap))) 100%;
+  filter: drop-shadow(0 calc(var(--lens-size) * 0.008) calc(var(--lens-size) * 0.02) rgba(0, 0, 0, 0.55));
+  /* Unexposed stock carries on past the last frame, but dissolves instead of
+     being sliced off square by the viewport edge. Measured in lens widths
+     rather than percentages of the stock, so the fade lands just past the last
+     frame no matter how long the stock is. */
+  mask-image: linear-gradient(
+    to right,
+    #000 0 calc(var(--lens-size) * 1.05),
+    transparent calc(var(--lens-size) * 1.6)
+  );
+}
+
+/* Darkens the stock where it passes under the barrel, so the film reads as
+   coming out from behind the lens rather than starting at its edge. */
+.film-throat {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--lens-size) * var(--film-tuck));
+  width: calc(var(--lens-size) * 0.34);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+}
+
+.film-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--lens-size) * var(--film-gate));
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.finder-rest h1 {
-  margin: 0 0 0.55rem;
-  font-size: clamp(1.7rem, 6vmin, 3.4rem);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 0.88;
-}
-
-.finder-rest h1 span {
-  display: block;
-}
-
-.lede {
-  margin: 0;
-  font-size: clamp(0.92rem, 2.2vmin, 1.15rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--ink-soft);
-}
-
-.finder-copy h2 {
-  margin: 0 0 0.7rem;
-  font-size: clamp(1.05rem, 3.2vmin, 1.55rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-}
-
-.finder-copy p {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: clamp(0.82rem, 2vmin, 0.98rem);
-  line-height: 1.45;
-}
-
-.finder-list,
-.finder-photos {
-  margin: 0;
+  align-items: center;
+  gap: calc(var(--lens-size) * var(--film-frame-gap));
   padding: 0;
-  list-style: none;
+  pointer-events: auto;
+  touch-action: pan-y;
+  cursor: grab;
+  transform: translate3d(calc(var(--film-offset, 0px) + var(--film-hx, 0px)), 0, 0)
+    rotate(var(--film-hy, 0deg));
+  transform-origin: left center;
+  will-change: transform;
 }
 
-.finder-list li {
-  padding: 0.45rem 0;
-  border-top: 1px solid var(--line);
+.film-track:focus-visible {
+  outline: none;
 }
 
-.finder-list li:last-child,
-.finder-photos li:last-child {
-  padding-bottom: 0;
+.film[data-dragging='true'] .film-track {
+  cursor: grabbing;
 }
 
-.finder-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-        font-weight: 600;
-  letter-spacing: -0.03em;
-  transition: color 160ms ease, transform 160ms var(--ease-out);
+.film-frame {
+  position: relative;
+  flex: 0 0 calc(var(--lens-size) * var(--film-frame-w));
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: calc(var(--lens-size) * 0.006);
+  background: #0b0d0f;
+  box-shadow: inset 0 0 0 1px rgba(224, 216, 196, 0.1);
+  opacity: 0.58;
+  transition: opacity 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
 }
 
-.finder-link::after {
-  content: '↗';
-  font-size: 0.78em;
+.film-frame[data-selected='true'] {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px rgba(224, 216, 196, 0.34);
 }
 
-.finder-link:active,
-.finder-email:active {
-  transform: scale(0.97);
+.film-track:focus-visible .film-frame[data-selected='true'] {
+  box-shadow: inset 0 0 0 2px var(--paper);
 }
 
-.finder-link:active {
-  transform: scale(0.97);
+/* Each asset carries its own 3:2 viewBox window, so this fits exactly and
+   never crops the composition unpredictably. */
+.film-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
 }
 
-.finder-list p,
-.finder-photos p {
-  margin-top: 0.15rem;
+.film-art-tone {
+  background: linear-gradient(150deg, #24282c 0%, #14171a 100%);
 }
 
-.finder-photos li {
-  display: grid;
-  grid-template-columns: 2.4rem 1fr;
-  gap: 0.65rem;
-  align-items: center;
-  padding: 0.4rem 0;
+.film-frame[data-tone='bronze'] .film-art-tone {
+  background: linear-gradient(150deg, #6b4a2a 0%, #17130f 100%);
 }
 
-.finder-photos h3 {
-  margin: 0;
-  font-size: 0.92rem;
-        font-weight: 600;
-  letter-spacing: -0.03em;
+.film-frame[data-tone='teal'] .film-art-tone {
+  background: linear-gradient(150deg, #234a45 0%, #10171a 100%);
 }
 
-.photo-chip {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 0.45rem;
-}
-
-.tone-japan {
-  background: linear-gradient(165deg, #1c2740 0%, #9a3f12 100%);
-}
-
-.tone-southwest {
-  background: linear-gradient(160deg, #c4783a 0%, #3d2116 100%);
-}
-
-.tone-acadia {
-  background: linear-gradient(170deg, #1e3a32 0%, #8ba3b0 100%);
-}
-
-.finder-email {
-  margin-top: 0.9rem;
-  font-size: clamp(0.95rem, 2.8vmin, 1.25rem);
-        font-weight: 600;
-  letter-spacing: -0.04em;
-  word-break: break-word;
-  transition: opacity 160ms ease, transform 160ms var(--ease-out);
-}
-
-.finder-foot {
-  margin-top: 0.8rem;
-  font-size: 0.75rem;
+.film-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.45em 0.6em 0.4em;
+  font-size: clamp(0.5rem, 1.35vmin, 0.68rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: linear-gradient(to top, rgba(6, 7, 8, 0.88), rgba(6, 7, 8, 0));
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -375,19 +489,77 @@
     fill: var(--paper);
   }
 
-  .finder-link:hover,
-  .finder-email:hover {
+  .finder-action:hover {
     color: var(--accent);
+  }
+
+  .film-frame:hover {
+    opacity: 0.8;
+  }
+
+  .film-frame[data-selected='true']:hover {
+    opacity: 1;
+  }
+
+  .film-track {
+    transition: transform 260ms var(--ease-out);
+  }
+
+  .film[data-dragging='true'] .film-track {
+    transition: none;
+  }
+}
+
+@media (max-width: 860px) {
+  /* The strip stops feeding sideways and stacks under the lens, so it never
+     pushes the instrument off-centre on a narrow screen. */
+  .instrument {
+    aspect-ratio: auto;
+  }
+
+  .lens {
+    aspect-ratio: 1;
+  }
+
+  /* Stacked, there is no tail to counterbalance. */
+  .instrument {
+    transform: none;
+  }
+
+  .film {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-top: calc(var(--lens-size) * 0.05);
+    transform: none;
+  }
+
+  .film-stock {
+    mask-image: none;
+  }
+
+  .film-stock,
+  .film-track {
+    left: 0;
+  }
+
+  .film-throat {
+    display: none;
+  }
+
+  .film-track {
+    /* With no barrel to feed from, the gate moves to the middle of the strip.
+       Padding it here keeps the offset maths in useFilmStrip layout-agnostic:
+       the selected frame always rests at the track's content origin. */
+    padding-left: calc(50% - var(--lens-size) * var(--film-frame-w) / 2);
+    transform: translate3d(var(--film-offset, 0px), 0, 0);
   }
 }
 
 @media (max-width: 640px) {
   .stage {
+    --lens-size: min(88vmin, 40rem);
     padding: 0.6rem;
-  }
-
-  .lens {
-    width: min(94vmin, 40rem);
   }
 
   /* The engraving scales with the barrel, so it needs a bigger relative
@@ -411,14 +583,23 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .iris {
+  .film-track,
+  .film-frame {
     transition: none;
+  }
+
+  .film-track {
+    transform: translate3d(var(--film-offset, 0px), 0, 0);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   .glass-art {
     mix-blend-mode: normal;
+    opacity: 1;
+  }
+
+  .film-frame {
     opacity: 1;
   }
 }
