@@ -1,3 +1,16 @@
+// The one line each stop shows in the viewfinder. Everything longer lives
+// in the detail sheet.
+export const subjects = {
+  rest: { title: 'Nayeem Rahman', line: 'Tinkerer and product manager.' },
+  about: { title: 'Memory & connection' },
+  work: { title: 'Things I’m building' },
+  photos: { title: 'Places that stayed' },
+  contact: { title: 'Say hello' },
+};
+
+export const about =
+  'I like building things that focus on memories and connection, usually through code and photography.';
+
 export const projects = [
   {
     name: 'Reston',

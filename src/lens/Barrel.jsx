@@ -1,9 +1,21 @@
 import { Fragment } from 'react';
-import { STOPS } from './stops';
-import { R, STOP_HALF_SPAN, TYPE, annularSectorPath, arcPath, radialLine } from './geometry';
+import { APERTURE, FOCAL_RANGE, STOPS } from './stops';
+import {
+  NAMEPLATE_HALF_SPAN,
+  R,
+  STOP_HALF_SPAN,
+  TYPE,
+  annularSectorPath,
+  arcPath,
+  radialLine,
+} from './geometry';
 
 const MINOR_STEP = 5;
-const STOP_ANGLES = new Set(STOPS.map((stop) => ((stop.angle % 360) + 360) % 360));
+const STOP_ANGLES = new Set(STOPS.map((stop) => stop.angle));
+// A zoom scale only covers the ring's travel; the rest of the band is
+// left clean for the maker's engraving.
+const SCALE_START = Math.ceil((STOPS[0].angle - STOP_HALF_SPAN) / MINOR_STEP) * MINOR_STEP;
+const SCALE_END = Math.floor((STOPS[STOPS.length - 1].angle + STOP_HALF_SPAN) / MINOR_STEP) * MINOR_STEP;
 
 function BodyRings() {
   const knurl = [];
@@ -42,7 +54,7 @@ function BodyRings() {
 
 function Ticks() {
   const marks = [];
-  for (let angle = 0; angle < 360; angle += MINOR_STEP) {
+  for (let angle = SCALE_START; angle <= SCALE_END; angle += MINOR_STEP) {
     const major = STOP_ANGLES.has(angle);
     const { x1, y1, x2, y2 } = radialLine(
       angle,
@@ -61,6 +73,25 @@ function Ticks() {
     );
   }
   return <g className="barrel-ticks">{marks}</g>;
+}
+
+// Drawn right to left along the lower arc so the text reads upright.
+function Nameplate() {
+  return (
+    <g aria-hidden="true">
+      <path
+        id="arc-nameplate"
+        fill="none"
+        d={arcPath(R.nameplate, 180 + NAMEPLATE_HALF_SPAN, 180 - NAMEPLATE_HALF_SPAN)}
+      />
+      <text className="nameplate" textAnchor="middle" fontSize={TYPE.labelSize}>
+        <textPath href="#arc-nameplate" startOffset="50%">
+          NAYEEM RAHMAN<tspan className="nameplate-dot"> ● </tspan>
+          {FOCAL_RANGE} 1:{APERTURE}
+        </textPath>
+      </text>
+    </g>
+  );
 }
 
 export default function Barrel({ liveStop, selectStop, didDragRef }) {
@@ -88,6 +119,7 @@ export default function Barrel({ liveStop, selectStop, didDragRef }) {
 
       <BodyRings />
       <Ticks />
+      <Nameplate />
 
       {STOPS.map((stop) => {
         const live = liveStop.id === stop.id;

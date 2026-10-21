@@ -115,9 +115,21 @@
 }
 
 .stop-mm,
-.stop-label {
-  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+.stop-label,
+.nameplate {
+  font-family: var(--engrave);
+  font-variant-numeric: tabular-nums;
   fill: inherit;
+}
+
+.nameplate {
+  fill: #8f8574;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+
+.nameplate-dot {
+  fill: #c78e5a;
 }
 
 .stop-mm {
@@ -131,6 +143,12 @@
 
 .stop-mark.is-live {
   fill: var(--paper);
+}
+
+/* The default outline is the link's rectangular bounding box, which cuts
+   across the band. The sector highlight below is the focus indicator. */
+.stop-mark:focus-visible {
+  outline: none;
 }
 
 .stop-mark:focus-visible .stop-hit {
@@ -178,9 +196,10 @@
   z-index: 2;
   overflow: hidden;
   border-radius: 50%;
-  background: var(--paper);
+  /* Light falls off toward the edge of a real finder. */
+  background: radial-gradient(circle closest-side, var(--paper) 72%, #e3dccd 100%);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px rgba(28, 25, 21, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(28, 25, 21, 0.16), inset 0 0 1.4rem rgba(28, 25, 21, 0.1);
   cursor: auto;
   touch-action: pan-y;
 }
@@ -205,6 +224,87 @@
 
 .viewfinder-panel::-webkit-scrollbar {
   display: none;
+}
+
+/* Zooming in magnifies the incoming frame, zooming out shrinks it, and the
+   blur clearing reads as focus locking. */
+.viewfinder-panel {
+  animation: focus-pull 380ms var(--ease-out) both;
+}
+
+.viewfinder-panel[data-direction='in'] {
+  --zoom-from: 0.9;
+}
+
+.viewfinder-panel[data-direction='out'] {
+  --zoom-from: 1.1;
+}
+
+@keyframes focus-pull {
+  from {
+    opacity: 0.35;
+    filter: blur(3px);
+    transform: scale(var(--zoom-from, 1));
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.finder-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: var(--engrave);
+  font-size: clamp(0.5rem, 1.3vmin, 0.68rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hud-top,
+.hud-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1.1em;
+  line-height: 1;
+}
+
+.hud-top {
+  top: 7.5%;
+}
+
+.hud-bottom {
+  bottom: 7.5%;
+}
+
+.hud-af {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.hud-af::before {
+  content: '';
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background-color 120ms ease;
+}
+
+.hud-af[data-focused='true']::before {
+  background: var(--accent);
+  transition-delay: 320ms;
 }
 
 .iris {
@@ -235,12 +335,13 @@
   stroke-width: 0.4;
 }
 
-.finder-rest,
-.finder-copy {
+.finder-frame {
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .finder-rest h1 {
@@ -263,85 +364,199 @@
   color: var(--ink-soft);
 }
 
-.finder-copy h2 {
-  margin: 0 0 0.7rem;
-  font-size: clamp(1.05rem, 3.2vmin, 1.55rem);
+.finder-hint {
+  margin: 1rem 0 0;
+  font-family: var(--engrave);
+  font-size: clamp(0.58rem, 1.4vmin, 0.72rem);
   font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
-.finder-copy p {
+.finder-subject {
+  width: 100%;
+  border-radius: 0.75rem;
+  cursor: zoom-in;
+  transition: transform 160ms var(--ease-out);
+}
+
+.finder-subject:active {
+  transform: scale(0.97);
+}
+
+.subject-title {
+  font-size: clamp(1.5rem, 5.4vmin, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+.finder-subject .finder-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.finder-subject .finder-hint::after {
+  content: '+';
+  font-size: 1.3em;
+  line-height: 0;
+  transition: transform 160ms var(--ease-out);
+}
+
+/* Detail sheet: a printed card that sits over the stage. */
+.sheet {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: min(80svh, 40rem);
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.55);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.sheet[open] {
+  animation: sheet-in 280ms var(--ease-out);
+}
+
+.sheet::backdrop {
+  background: rgba(10, 9, 8, 0.62);
+  backdrop-filter: blur(6px);
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.98);
+  }
+}
+
+.sheet-inner {
+  padding: 1.1rem 1.5rem 1.75rem;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.sheet-spec {
+  display: flex;
+  gap: 1.1em;
+  margin: 0;
+  font-family: var(--engrave);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.sheet-close {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-right: -0.4rem;
+  border-radius: 50%;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--ink-soft);
+  transition: background-color 160ms ease, transform 160ms var(--ease-out);
+}
+
+.sheet-close:active {
+  transform: scale(0.94);
+}
+
+.sheet h2 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.sheet-body p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: clamp(0.82rem, 2vmin, 0.98rem);
-  line-height: 1.45;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
-.finder-list,
-.finder-photos {
+.sheet-list,
+.sheet-photos {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.finder-list li {
-  padding: 0.45rem 0;
+.sheet-list li {
+  padding: 0.8rem 0;
   border-top: 1px solid var(--line);
 }
 
-.finder-list li:last-child,
-.finder-photos li:last-child {
+.sheet-list li:last-child,
+.sheet-photos li:last-child {
   padding-bottom: 0;
 }
 
-.finder-link {
+.sheet-link,
+.sheet-name {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-        font-weight: 600;
+  font-weight: 600;
   letter-spacing: -0.03em;
-  transition: color 160ms ease, transform 160ms var(--ease-out);
 }
 
-.finder-link::after {
+.sheet-link {
+  transition: color 160ms ease;
+}
+
+.sheet-link::after {
   content: '↗';
   font-size: 0.78em;
 }
 
-.finder-link:active,
-.finder-email:active {
-  transform: scale(0.97);
+.sheet-list p,
+.sheet-photos p {
+  margin-top: 0.2rem;
 }
 
-.finder-link:active {
-  transform: scale(0.97);
-}
-
-.finder-list p,
-.finder-photos p {
-  margin-top: 0.15rem;
-}
-
-.finder-photos li {
+.sheet-photos li {
   display: grid;
-  grid-template-columns: 2.4rem 1fr;
-  gap: 0.65rem;
+  grid-template-columns: 3.4rem 1fr;
+  gap: 0.9rem;
   align-items: center;
-  padding: 0.4rem 0;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--line);
 }
 
-.finder-photos h3 {
+.sheet-photos h3 {
   margin: 0;
-  font-size: 0.92rem;
-        font-weight: 600;
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
+/* Styled as a 35mm slide mount. */
 .photo-chip {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 0.45rem;
+  width: 3.4rem;
+  height: 3.4rem;
+  border: 0.4rem solid #fbf9f4;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 1px var(--line), 0 1px 3px rgba(28, 25, 21, 0.18);
 }
 
 .tone-japan {
@@ -356,18 +571,22 @@
   background: linear-gradient(170deg, #1e3a32 0%, #8ba3b0 100%);
 }
 
-.finder-email {
-  margin-top: 0.9rem;
-  font-size: clamp(0.95rem, 2.8vmin, 1.25rem);
-        font-weight: 600;
+.sheet-email {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+  font-weight: 600;
   letter-spacing: -0.04em;
-  word-break: break-word;
-  transition: opacity 160ms ease, transform 160ms var(--ease-out);
+  transition: color 160ms ease, transform 160ms var(--ease-out);
 }
 
-.finder-foot {
+.sheet-email:active {
+  transform: scale(0.97);
+}
+
+.sheet-body .sheet-foot {
   margin-top: 0.8rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -375,15 +594,41 @@
     fill: var(--paper);
   }
 
-  .finder-link:hover,
-  .finder-email:hover {
+  .finder-subject:hover .finder-hint::after {
+    transform: rotate(90deg);
+  }
+
+  .sheet-close:hover {
+    background: var(--line);
+  }
+
+  .sheet-link:hover,
+  .sheet-email:hover {
     color: var(--accent);
   }
 }
-
 @media (max-width: 640px) {
   .stage {
     padding: 0.6rem;
+  }
+
+  /* On phones the sheet rises from the bottom edge. */
+  .sheet {
+    width: 100%;
+    max-width: 100%;
+    max-height: 85svh;
+    margin: auto 0 0;
+    border-radius: 1rem 1rem 0 0;
+  }
+
+  .sheet[open] {
+    animation-name: sheet-up;
+  }
+
+  @keyframes sheet-up {
+    from {
+      transform: translateY(100%);
+    }
   }
 
   .lens {
@@ -396,7 +641,8 @@
     font-size: 4.1px;
   }
 
-  .stop-label {
+  .stop-label,
+  .nameplate {
     font-size: 2.7px;
     letter-spacing: 0.12em;
   }
@@ -411,8 +657,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .iris {
+  .iris,
+  .hud-af::before {
     transition: none;
+  }
+
+  .viewfinder-panel,
+  .sheet[open] {
+    animation: none;
   }
 }
 

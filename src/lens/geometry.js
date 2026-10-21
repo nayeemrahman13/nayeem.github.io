@@ -13,6 +13,9 @@ export const R = {
   tickMajorInner: 43.6,
   mm: 39.8,
   label: 36.4,
+  // Baseline for the maker's engraving on the lower arc. Its glyphs grow
+  // toward the center, so the baseline sits just outside mid-band.
+  nameplate: 42.4,
   bandInner: 35.4,
   gripOuter: 34.2,
   gripInner: 30.0,
@@ -30,6 +33,9 @@ export const TYPE = {
 // Angular half-width of one stop's engraving. Stops sit 35 degrees apart,
 // so 16 leaves a visible gap between neighbouring marks.
 export const STOP_HALF_SPAN = 16;
+
+// Half-width of the maker's engraving, centered on 6 o'clock.
+export const NAMEPLATE_HALF_SPAN = 55;
 
 // Zero degrees is 12 o'clock; positive is clockwise.
 export function polar(angleDeg, r) {

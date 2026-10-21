@@ -219,21 +219,23 @@ export function useZoomRing() {
   const onKeyDown = useCallback(
     (event) => {
       const index = stopIndex(activeStop);
+      let next = null;
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-        event.preventDefault();
-        commitStop(STOPS[Math.min(STOPS.length - 1, index + 1)]);
+        next = STOPS[Math.min(STOPS.length - 1, index + 1)];
       }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-        event.preventDefault();
-        commitStop(STOPS[Math.max(0, index - 1)]);
+        next = STOPS[Math.max(0, index - 1)];
       }
-      if (event.key === 'Home') {
-        event.preventDefault();
-        commitStop(STOPS[0]);
-      }
-      if (event.key === 'End') {
-        event.preventDefault();
-        commitStop(STOPS[STOPS.length - 1]);
+      if (event.key === 'Home') next = STOPS[0];
+      if (event.key === 'End') next = STOPS[STOPS.length - 1];
+      if (!next) return;
+
+      event.preventDefault();
+      commitStop(next);
+      // If focus is on a stop mark, carry it to the new stop so the focus
+      // indicator never points at a stop the ring has already left.
+      if (event.target.closest?.('.stop-mark')) {
+        document.getElementById(`stop-${next.id}`)?.focus({ preventScroll: true });
       }
     },
     [activeStop, commitStop],

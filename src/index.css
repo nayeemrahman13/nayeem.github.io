@@ -6,6 +6,7 @@
   --line: rgba(28, 25, 21, 0.12);
   --accent: #9a3f12;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --engrave: "DIN Alternate", Bahnschrift, "DIN 2014", "Barlow", system-ui, sans-serif;
 
   font: 100%/1.5 system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--paper);
@@ -69,6 +70,7 @@ button {
   outline-offset: 3px;
 }
 
-.viewfinder :focus-visible {
+.viewfinder :focus-visible,
+.sheet :focus-visible {
   outline-color: var(--ink);
 }

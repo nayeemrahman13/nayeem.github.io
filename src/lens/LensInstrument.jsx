@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import Barrel from './Barrel';
 import IndexMark from './IndexMark';
+import DetailSheet from './DetailSheet';
 import Viewfinder from './Viewfinder';
+import ViewfinderHud from './ViewfinderHud';
 import { CSS_VARS } from './geometry';
-import { STOPS } from './stops';
+import { STOPS, stopIndex } from './stops';
 import { useZoomRing } from './useZoomRing';
 
 const IRIS_MS = 220;
-const ELEVENLABS_AGENT = 'agent_6401k1bc5tp8f3rsfjng67q7f88t';
 
 function IrisBlades({ closed }) {
   const blades = Array.from({ length: 8 }, (_, index) => (
@@ -54,10 +55,18 @@ export default function LensInstrument() {
   } = useZoomRing();
   const [contentStop, setContentStop] = useState(activeStop);
   const [irisClosed, setIrisClosed] = useState(false);
+  const [zoomDirection, setZoomDirection] = useState('in');
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  useEffect(() => {
+    setSheetOpen(false);
+  }, [activeStop.id]);
 
   useEffect(() => {
     if (contentStop.id === activeStop.id) return undefined;
+    const direction = stopIndex(activeStop) > stopIndex(contentStop) ? 'in' : 'out';
     if (reduceMotion) {
+      setZoomDirection(direction);
       setContentStop(activeStop);
       setIrisClosed(false);
       return undefined;
@@ -65,11 +74,12 @@ export default function LensInstrument() {
 
     setIrisClosed(true);
     const timer = window.setTimeout(() => {
+      setZoomDirection(direction);
       setContentStop(activeStop);
       setIrisClosed(false);
     }, IRIS_MS);
     return () => window.clearTimeout(timer);
-  }, [activeStop, contentStop.id, reduceMotion]);
+  }, [activeStop, contentStop, reduceMotion]);
 
   return (
     <div className="stage">
@@ -102,7 +112,12 @@ export default function LensInstrument() {
         <OptionalArt className="glass-art" src="/lens/glass.svg" />
 
         <div className="viewfinder">
-          <Viewfinder stop={contentStop} />
+          <Viewfinder
+            stop={contentStop}
+            direction={zoomDirection}
+            onOpen={() => setSheetOpen(true)}
+          />
+          <ViewfinderHud stop={contentStop} focused={!irisClosed} />
           <div className="iris" data-closed={irisClosed} aria-hidden="true">
             <IrisBlades closed={irisClosed} />
             <OptionalArt className="iris-art" src="/lens/iris.svg" />
@@ -112,9 +127,7 @@ export default function LensInstrument() {
         <IndexMark />
       </div>
 
-      {contentStop.id === 'contact' ? (
-        <elevenlabs-convai agent-id={ELEVENLABS_AGENT} />
-      ) : null}
+      <DetailSheet stop={contentStop} open={sheetOpen} onClose={() => setSheetOpen(false)} />
     </div>
   );
 }

@@ -1,10 +1,13 @@
 export const STOPS = [
-  { id: 'rest', mm: '∞', label: 'Home', hash: '', angle: -70 },
+  { id: 'rest', mm: '16', label: 'Home', hash: '', angle: -70 },
   { id: 'about', mm: '24', label: 'About', hash: '#about', angle: -35 },
   { id: 'work', mm: '50', label: 'Work', hash: '#work', angle: 0 },
   { id: 'photos', mm: '85', label: 'Photos', hash: '#photos', angle: 35 },
   { id: 'contact', mm: '135', label: 'Contact', hash: '#contact', angle: 70 },
 ];
+
+export const APERTURE = '2.8';
+export const FOCAL_RANGE = `${STOPS[0].mm}–${STOPS[STOPS.length - 1].mm}mm`;
 
 export function rotationForStop(stop) {
   return -stop.angle;
