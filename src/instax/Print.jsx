@@ -22,7 +22,9 @@ export default function Print({ stop, printRef, scrollRef, developRef, onFocus, 
         <p className="print-stamp" aria-hidden="true">
           {exposure(stop)} · {frameNumber(stop)}
         </p>
-        <div className="print-develop" ref={developRef} aria-hidden="true" />
+        <div className="print-develop" ref={developRef} aria-hidden="true">
+          <img src="/instax/developing.svg" alt="" />
+        </div>
       </div>
       <footer className="print-strip">
         <h2 id="print-title" className="print-caption">

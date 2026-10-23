@@ -24,6 +24,11 @@
     0 calc(0.3rem + var(--lifted) * 1.4rem) calc(0.6rem + var(--lifted) * 2.8rem) rgba(0, 0, 0, 0.42);
 }
 
+/* Instax Wide prints are landscape, about 4:3 including the frame. */
+.instax[data-format='wide'] .print {
+  width: min(calc(100vw - 3rem), calc((100svh - 1.5rem) * 1.32), 72rem);
+}
+
 .print:not([data-out='true']) {
   cursor: pointer;
 }
@@ -62,6 +67,17 @@
   pointer-events: none;
   background: linear-gradient(165deg, #cdd5d9 0%, #b9c3c9 55%, #aab4ba 100%);
   will-change: opacity;
+}
+
+.print-develop img {
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .print-develop img {
+    display: none;
+  }
 }
 
 .print-stamp {

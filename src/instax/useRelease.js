@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
-import { SLOT_FRACTION } from './body';
 
 // Share of the scroll spent pulling the print out of the slot. The rest
 // carries the camera away and lifts the print to fill the screen.
 const PULL_SHARE = 0.55;
 const PEEK_PX = 7;
+// While the page rests at the top, the print edges out a little now and
+// then to show it can be pulled.
+const NUDGE_PX = 9;
+const NUDGE_MS = 900;
+const NUDGE_EVERY_MS = 4200;
 const PRINT_TO_SLOT = 0.94;
 const SCREEN_GAP = 16;
 const OUT_AT = 0.995;
@@ -18,7 +22,7 @@ function smoothstep(from, to, value) {
   return t * t * (3 - 2 * t);
 }
 
-export function useRelease({ enabled, reduceMotion, resetKey }) {
+export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
   const trackRef = useRef(null);
   const anchorRef = useRef(null);
   const cameraRef = useRef(null);
@@ -26,6 +30,8 @@ export function useRelease({ enabled, reduceMotion, resetKey }) {
   const scrollRef = useRef(null);
   const developRef = useRef(null);
   const frameRef = useRef(0);
+  const nudgeRef = useRef(0);
+  const progressRef = useRef(0);
 
   const travel = useCallback(() => {
     const track = trackRef.current;
@@ -41,6 +47,7 @@ export function useRelease({ enabled, reduceMotion, resetKey }) {
     if (!track || !anchor || !camera) return;
 
     const p = enabled ? clamp01(-track.getBoundingClientRect().top / travel()) : 0;
+    progressRef.current = p;
     if (!print) {
       camera.style.transform = '';
       camera.style.opacity = '';
@@ -64,15 +71,15 @@ export function useRelease({ enabled, reduceMotion, resetKey }) {
 
     const vh = window.innerHeight;
     const cam = anchor.getBoundingClientRect();
-    const slotX = cam.left + cam.width * SLOT_FRACTION.x;
-    const slotY = cam.top + cam.height * SLOT_FRACTION.y;
+    const slotX = cam.left + cam.width * slot.x;
+    const slotY = cam.top + cam.height * slot.y;
 
     // The print is laid out at its full-screen size; every earlier pose is
     // a uniform scale of it, so its text never stretches.
     const finalLeft = print.offsetLeft;
     const finalTop = print.offsetTop;
     const finalW = print.offsetWidth;
-    const smallW = cam.width * SLOT_FRACTION.w * PRINT_TO_SLOT;
+    const smallW = cam.width * slot.w * PRINT_TO_SLOT;
     const startScale = smallW / finalW;
     const smallH = print.offsetHeight * startScale;
 
@@ -83,7 +90,8 @@ export function useRelease({ enabled, reduceMotion, resetKey }) {
     const lift = liftMax * pulled;
     const cameraY = -lift - lifted * (cam.bottom - lift + SCREEN_GAP);
 
-    const pullY = slotY - lift - (smallH - PEEK_PX) * (1 - pulled);
+    const peek = PEEK_PX + (p === 0 ? nudgeRef.current : 0);
+    const pullY = slotY - lift - (smallH - peek) * (1 - pulled);
     const x = lerp(slotX - smallW / 2, finalLeft, lifted);
     const y = lerp(pullY, finalTop, lifted);
     const scale = lerp(startScale, 1, lifted);
@@ -98,7 +106,7 @@ export function useRelease({ enabled, reduceMotion, resetKey }) {
     if (developRef.current) {
       developRef.current.style.opacity = String(1 - smoothstep(0.08, 0.92, p));
     }
-  }, [enabled, reduceMotion, travel]);
+  }, [enabled, reduceMotion, slot, travel]);
 
   const schedule = useCallback(() => {
     if (!frameRef.current) frameRef.current = requestAnimationFrame(update);
@@ -119,6 +127,28 @@ export function useRelease({ enabled, reduceMotion, resetKey }) {
       frameRef.current = 0;
     };
   }, [schedule]);
+
+  useEffect(() => {
+    if (!enabled || reduceMotion) return undefined;
+    let raf = 0;
+    const nudge = () => {
+      if (progressRef.current > 0 || document.hidden) return;
+      const start = performance.now();
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / NUDGE_MS);
+        nudgeRef.current = NUDGE_PX * Math.sin(Math.PI * t) ** 2;
+        update();
+        if (t < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    const timer = window.setInterval(nudge, NUDGE_EVERY_MS);
+    return () => {
+      window.clearInterval(timer);
+      cancelAnimationFrame(raf);
+      nudgeRef.current = 0;
+    };
+  }, [enabled, reduceMotion, update]);
 
   const scrollToShare = useCallback(
     (share) => {

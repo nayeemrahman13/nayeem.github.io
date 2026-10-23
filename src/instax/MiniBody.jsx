@@ -1,8 +1,11 @@
-import { BODY_BOX, LENS, SHUTTER } from './body';
+import { MINI } from './body';
 
-// Body artwork drawn with QuiverAI (instax-camera-soft.svg), split into
-// parts the camera animates on its own.
-export default function InstaxBody({ counter }) {
+const { box: BODY_BOX, lens: LENS } = MINI;
+const SHUTTER_CX = 64.5;
+
+// Portrait body for phones, drawn with QuiverAI (instax-camera-soft.svg)
+// and split into parts the camera animates on its own.
+export default function MiniBody({ counter }) {
   return (
     <svg
       className="instax-body"
@@ -106,6 +109,8 @@ export default function InstaxBody({ counter }) {
         />
       </g>
 
+      <circle className="ready-light" cx="53.4" cy="15.2" r="0.6" />
+
       <g id="sensor">
         <path
           d="m48.65 14.68h-0.69c-0.62 0-1.01 0.43-1.01 1.04v3.62c0 0.65 0.43 1.08 1.03 1.08h0.66c0.58 0 1-0.45 1-1.06v-3.65c0-0.61-0.39-1.03-0.99-1.03z"
@@ -119,7 +124,7 @@ export default function InstaxBody({ counter }) {
 
       <ellipse
         id="shutter-halo"
-        cx={SHUTTER.cx}
+        cx={SHUTTER_CX}
         cy="31.26"
         rx="4.459"
         ry="4.902"
