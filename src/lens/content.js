@@ -1,5 +1,5 @@
 // The one line each stop shows in the viewfinder. Everything longer lives
-// in the detail sheet.
+// on the print.
 export const subjects = {
   rest: { title: 'Nayeem Rahman', line: 'Tinkerer and product manager.' },
   about: { title: 'Memory & connection' },

@@ -1,0 +1,222 @@
+/* The print is always laid out at its full-screen size. useRelease scales
+   it down from the top-left corner to sit in the camera's slot. */
+.print {
+  --hand: "Bradley Hand", "Segoe Print", "Marker Felt", "Comic Sans MS", cursive;
+  --lifted: 0;
+  position: absolute;
+  z-index: 10;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 0;
+  right: 0;
+  width: min(calc(100vw - 1.5rem), 46rem);
+  margin-inline: auto;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: clamp(0.7rem, 3.5vw, 1.6rem) clamp(0.7rem, 3.5vw, 1.6rem) 0;
+  border-radius: 0.35rem;
+  background: #fbfaf5;
+  color: var(--ink);
+  transform-origin: 0 0;
+  will-change: transform;
+  box-shadow:
+    0 0 0 1px rgba(28, 25, 21, 0.06),
+    0 calc(0.3rem + var(--lifted) * 1.4rem) calc(0.6rem + var(--lifted) * 2.8rem) rgba(0, 0, 0, 0.42);
+}
+
+.print:not([data-out='true']) {
+  cursor: pointer;
+}
+
+.print-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.15rem;
+  background: radial-gradient(120% 90% at 40% 30%, var(--paper) 55%, #e5ddcc 100%);
+}
+
+.print-scroll {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: clamp(1.25rem, 6vw, 3rem);
+  scrollbar-width: none;
+}
+
+.print-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.print[data-out='true'] .print-scroll {
+  overflow-y: auto;
+}
+
+.print-scroll > * {
+  max-width: 34rem;
+}
+
+/* An unexposed Instax frame is a flat blue-grey that clears as it develops. */
+.print-develop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(165deg, #cdd5d9 0%, #b9c3c9 55%, #aab4ba 100%);
+  will-change: opacity;
+}
+
+.print-stamp {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.65rem;
+  margin: 0;
+  font-family: var(--engrave);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #e0782f;
+  opacity: 0.85;
+  text-shadow: 0 0 0.35rem rgba(224, 120, 47, 0.35);
+  pointer-events: none;
+}
+
+.print-caption {
+  display: grid;
+  place-items: center;
+  height: clamp(4.25rem, 13svh, 7.5rem);
+  margin: 0;
+  font-family: var(--hand);
+  font-size: clamp(1.35rem, 5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #27304a;
+  rotate: -1.5deg;
+}
+
+.print-lede {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.6vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.28;
+  text-wrap: pretty;
+}
+
+.print-list,
+.print-photos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.print-list li {
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.print-list li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.print-link,
+.print-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: clamp(1.2rem, 4.2vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.print-link {
+  transition: color 160ms ease;
+}
+
+.print-link::after {
+  content: '↗';
+  font-size: 0.75em;
+}
+
+.print-list p,
+.print-photos p {
+  margin: 0.3rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.print-photos {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.print-photos li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.1rem;
+  align-items: center;
+}
+
+.mini-print {
+  width: clamp(5.5rem, 24vw, 8.5rem);
+  margin: 0;
+  padding: 6% 6% 0;
+  background: #fbfaf5;
+  border-radius: 0.15rem;
+  box-shadow: 0 0 0 1px rgba(28, 25, 21, 0.06), 0 0.35rem 0.8rem rgba(28, 25, 21, 0.2);
+  rotate: -2deg;
+}
+
+.print-photos li:nth-child(even) .mini-print {
+  rotate: 1.5deg;
+}
+
+.mini-print-image {
+  aspect-ratio: 46 / 62;
+}
+
+.mini-print figcaption {
+  padding: 0.35rem 0 0.45rem;
+  font-family: var(--hand);
+  font-size: 0.8rem;
+  text-align: center;
+  color: #27304a;
+}
+
+.tone-japan {
+  background: linear-gradient(165deg, #1c2740 0%, #9a3f12 100%);
+}
+
+.tone-southwest {
+  background: linear-gradient(160deg, #c4783a 0%, #3d2116 100%);
+}
+
+.tone-acadia {
+  background: linear-gradient(170deg, #1e3a32 0%, #8ba3b0 100%);
+}
+
+.print-email {
+  display: inline-block;
+  margin-top: 1.2rem;
+  font-size: clamp(1.35rem, 5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  transition: color 160ms ease, transform 160ms var(--ease-out);
+}
+
+.print-email:active {
+  transform: scale(0.97);
+}
+
+.print-foot {
+  margin: 0.8rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .print-link:hover,
+  .print-email:hover {
+    color: var(--accent);
+  }
+}

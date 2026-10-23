@@ -200,10 +200,12 @@ export function useZoomRing() {
   const onWheel = useCallback(
     (event) => {
       if (event.target.closest('.viewfinder')) return;
+      // Vertical scroll belongs to the page, which pulls the print out.
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
       event.preventDefault();
       cancelAnimationFrame(springRef.current);
       const next = rubberband(
-        rotationRef.current - event.deltaY * 0.12,
+        rotationRef.current - event.deltaX * 0.12,
         MIN_ROTATION,
         MAX_ROTATION,
       );

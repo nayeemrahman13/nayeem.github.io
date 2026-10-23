@@ -16,14 +16,9 @@ function Rest() {
 
 function Subject({ stop, onOpen }) {
   return (
-    <button
-      type="button"
-      className="finder-frame finder-subject"
-      aria-haspopup="dialog"
-      onClick={onOpen}
-    >
+    <button type="button" className="finder-frame finder-subject" onClick={onOpen}>
       <span className="subject-title">{subjects[stop.id].title}</span>
-      <span className="finder-hint">Look closer</span>
+      <span className="finder-hint">Scroll to print</span>
     </button>
   );
 }

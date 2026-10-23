@@ -71,6 +71,6 @@ button {
 }
 
 .viewfinder :focus-visible,
-.sheet :focus-visible {
+.print :focus-visible {
   outline-color: var(--ink);
 }
