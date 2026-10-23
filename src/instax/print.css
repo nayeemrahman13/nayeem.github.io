@@ -80,10 +80,50 @@
   pointer-events: none;
 }
 
-.print-caption {
+.print-strip {
+  position: relative;
   display: grid;
   place-items: center;
   height: clamp(4.25rem, 13svh, 7.5rem);
+}
+
+.print-back {
+  position: absolute;
+  right: 0;
+  bottom: clamp(0.5rem, 2svh, 0.9rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.4rem;
+  font-family: var(--engrave);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, background-color 160ms ease, transform 160ms var(--ease-out);
+}
+
+.print-back::before {
+  content: '↑';
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.print[data-out='true'] .print-back,
+.print-back:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.print-back:active {
+  transform: scale(0.96);
+}
+
+.print-caption {
   margin: 0;
   font-family: var(--hand);
   font-size: clamp(1.35rem, 5vw, 2.2rem);
@@ -218,5 +258,9 @@
   .print-link:hover,
   .print-email:hover {
     color: var(--accent);
+  }
+
+  .print-back:hover {
+    background: var(--line);
   }
 }

@@ -2,7 +2,7 @@ import { BODY_BOX, LENS, SHUTTER } from './body';
 
 // Body artwork drawn with QuiverAI (instax-camera-soft.svg), split into
 // parts the camera animates on its own.
-export default function InstaxBody() {
+export default function InstaxBody({ counter }) {
   return (
     <svg
       className="instax-body"
@@ -40,25 +40,39 @@ export default function InstaxBody() {
       </g>
 
       <g id="print-slot">
-        <rect x="16.5" y="71.4" width="47" height="1.3" rx="0.65" fill="#D8CFBB" />
+        <rect x="16" y="68.3" width="48" height="3.9" rx="1.95" fill="#D6CCB6" />
         <rect x="18" y="69" width="44" height="2.5" rx="1.25" fill="#26272A" />
         <rect x="19" y="69.35" width="42" height="0.6" rx="0.3" fill="#0F1011" />
+        <rect x="17" y="72.3" width="46" height="0.9" rx="0.45" fill="#F6F1E6" />
       </g>
 
-      <circle
-        id="lens-mount"
-        cx={LENS.cx}
-        cy={LENS.cy}
-        r="18.65"
-        fill="none"
-        stroke="#C78E5A"
-        strokeWidth="2.3"
-      />
+      <g id="lens-mount">
+        <circle cx={LENS.cx} cy={LENS.cy} r="20.6" fill="none" stroke="#D6CCB6" strokeWidth="0.8" />
+        <circle cx={LENS.cx} cy={LENS.cy} r="19.4" fill="none" stroke="#C78E5A" strokeWidth="1.6" />
+        <circle cx={LENS.cx} cy={LENS.cy} r="20.05" fill="none" stroke="#E4B78D" strokeWidth="0.25" />
+      </g>
+
+      <g id="counter">
+        <rect x="58.4" y="58.6" width="7.2" height="4.6" rx="1" fill="#D6CCB6" />
+        <rect x="59" y="59.1" width="6" height="3.6" rx="0.7" fill="#26272A" />
+        <text
+          className="counter-digit"
+          x="62"
+          y="61.95"
+          textAnchor="middle"
+          fontSize="2.6"
+        >
+          {counter}
+        </text>
+      </g>
 
       <g id="flash">
         <path
           d="m28.61 11.64h-7.56c-0.97 0-1.67 0.67-1.67 1.72v8.43c0 1.05 0.75 1.75 1.74 1.75h7.47c0.96 0 1.71-0.69 1.71-1.68v-8.54c0-1.01-0.69-1.68-1.69-1.68z"
           fill="#2B2D30"
+          stroke="#F9F6F1"
+          strokeOpacity="0.6"
+          strokeWidth="0.4"
         />
         <path
           d="m27.94 12.84h-6.39c-0.46 0-0.75 0.29-0.75 0.78v7.97c0 0.48 0.28 0.75 0.77 0.75h6.36c0.54 0 0.83-0.25 0.83-0.79v-7.94c0-0.51-0.27-0.77-0.82-0.77z"
@@ -78,6 +92,9 @@ export default function InstaxBody() {
         <path
           d="m63.11 12.83h-4.67c-1.1 0-1.78 0.69-1.78 1.82v4.72c0 1.14 0.77 1.85 1.81 1.85h4.64c1.08 0 1.84-0.7 1.84-1.8v-4.75c0-1.14-0.7-1.84-1.84-1.84z"
           fill="#2B2D30"
+          stroke="#F9F6F1"
+          strokeOpacity="0.6"
+          strokeWidth="0.4"
         />
         <path
           d="m62.05 14.68h-2.58c-0.66 0-0.98 0.32-0.98 0.97v2.72c0 0.67 0.34 0.98 0.99 0.98h2.56c0.63 0 0.95-0.32 0.95-0.96v-2.76c0-0.65-0.3-0.95-0.94-0.95z"

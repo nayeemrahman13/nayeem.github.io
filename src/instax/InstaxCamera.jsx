@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Lens from '../lens/Lens';
-import { STOPS } from '../lens/stops';
+import { STOPS, stopIndex } from '../lens/stops';
 import { useZoomRing } from '../lens/useZoomRing';
 import { CAMERA_VARS } from './body';
 import InstaxBody from './InstaxBody';
@@ -11,7 +11,7 @@ export default function InstaxCamera() {
   const ring = useZoomRing();
   const { activeStop, reduceMotion, selectStop } = ring;
   const hasPrint = activeStop.id !== 'rest';
-  const { trackRef, anchorRef, cameraRef, printRef, scrollRef, developRef, release } = useRelease({
+  const { trackRef, anchorRef, cameraRef, printRef, scrollRef, developRef, release, retract } = useRelease({
     enabled: hasPrint,
     reduceMotion,
     resetKey: activeStop.id,
@@ -28,6 +28,21 @@ export default function InstaxCamera() {
     }
     if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   }, [activeStop.id, release, reduceMotion]);
+
+  const putBack = useCallback(() => {
+    if (printRef.current?.contains(document.activeElement)) {
+      ring.lensRef.current?.focus({ preventScroll: true });
+    }
+    retract();
+  }, [printRef, retract, ring.lensRef]);
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape' && printRef.current?.dataset.out === 'true') putBack();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [printRef, putBack]);
 
   const shoot = () => {
     if (!reduceMotion) {
@@ -66,7 +81,7 @@ export default function InstaxCamera() {
         <div className="release-stage">
           <div className="camera-anchor" ref={anchorRef} style={CAMERA_VARS}>
             <div className="camera" ref={cameraRef}>
-              <InstaxBody />
+              <InstaxBody counter={stopIndex(activeStop) + 1} />
               <Lens ring={ring} onOpen={shoot} />
               <button type="button" className="shutter" aria-label="Take the picture" onClick={shoot} />
             </div>
@@ -78,6 +93,7 @@ export default function InstaxCamera() {
             developRef={developRef}
             onFocus={pullOnTap}
             onClick={pullOnTap}
+            onBack={putBack}
           />
         </div>
       </section>

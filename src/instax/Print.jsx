@@ -3,7 +3,7 @@ import { exposure, frameNumber } from '../lens/readout';
 import PrintContent from './PrintContent';
 import './print.css';
 
-export default function Print({ stop, printRef, scrollRef, developRef, onFocus, onClick }) {
+export default function Print({ stop, printRef, scrollRef, developRef, onFocus, onClick, onBack }) {
   if (stop.id === 'rest') return null;
 
   return (
@@ -24,9 +24,21 @@ export default function Print({ stop, printRef, scrollRef, developRef, onFocus, 
         </p>
         <div className="print-develop" ref={developRef} aria-hidden="true" />
       </div>
-      <h2 id="print-title" className="print-caption">
-        {subjects[stop.id].title}
-      </h2>
+      <footer className="print-strip">
+        <h2 id="print-title" className="print-caption">
+          {subjects[stop.id].title}
+        </h2>
+        <button
+          type="button"
+          className="print-back"
+          onClick={(event) => {
+            event.stopPropagation();
+            onBack();
+          }}
+        >
+          Back to camera
+        </button>
+      </footer>
     </article>
   );
 }
