@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="541" height="611" fill="none" viewBox="0 0 541 611" preserveAspectRatio="none">
+  <!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
+  <defs>
+    <radialGradient id="develop" cx="0" cy="0" r="1" gradientTransform="translate(270.5 305.5) rotate(90) scale(605.5 710.5)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A6B4BC" offset="0">
+        <animate attributeName="stop-color" values="#A6B4BC; #9EAFB9; #B2BFCA; #9FB0BB; #A6B4BC" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop stop-color="#ADBBC3" offset=".4479">
+        <animate attributeName="offset" values="0.4479; 0.52; 0.38; 0.48; 0.4479" dur="6s" repeatCount="indefinite"/>
+        <animate attributeName="stop-color" values="#ADBBC3; #B5C3CC; #A4B3BC; #B0BEC7; #ADBBC3" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop stop-color="#C1CBD2" offset="1"/>
+      <animate attributeName="gradientTransform" dur="6s" repeatCount="indefinite" values="translate(270.5 305.5) rotate(90) scale(605.5 710.5); translate(250 285) rotate(88) scale(630 735); translate(285 320) rotate(93) scale(580 685); translate(260 315) rotate(91) scale(620 720); translate(270.5 305.5) rotate(90) scale(605.5 710.5)"/>
+    </radialGradient>
+  </defs>
+  <rect width="541" height="611" fill="url(#develop)"/>
+</svg>

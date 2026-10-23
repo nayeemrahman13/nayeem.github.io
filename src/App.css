@@ -40,22 +40,193 @@
   border: 0;
 }
 
-.stage {
-  min-height: 100svh;
+/* The track is only taller than the screen when there is a print to pull,
+   and its extra height is the distance the pull takes. */
+.release-track {
+  position: relative;
+  height: 100svh;
+}
+
+.instax[data-print='true'] .release-track {
+  height: calc(100svh + 130svh);
+}
+
+.release-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
   display: grid;
   place-items: center;
-  padding: 3.25rem 1.25rem 2rem;
+  padding: 1rem;
+  /* A soft key light behind the camera, so the stage has depth, not a flat fill. */
+  background:
+    radial-gradient(ellipse 60% 52% at 50% 42%, rgba(255, 248, 238, 0.07), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.35));
+}
+
+.camera-anchor {
+  position: relative;
+  width: min(92vw, calc(66svh * 68 / 74), 34rem);
+}
+
+
+.camera {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* A camera at rest still looks alive: it floats very slightly. */
+.camera-idle {
+  position: absolute;
+  inset: 0;
+  animation: camera-breathe 5.5s ease-in-out infinite alternate;
+}
+
+@keyframes camera-breathe {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 0 -0.6%;
+  }
+}
+
+.ready-light {
+  fill: var(--accent);
+  animation: ready-blink 2.8s ease-in-out infinite;
+}
+
+@keyframes ready-blink {
+  0%,
+  62%,
+  100% {
+    opacity: 0.3;
+  }
+
+  74% {
+    opacity: 1;
+  }
+}
+
+.instax-body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0.2rem 0.3rem rgba(0, 0, 0, 0.3)) drop-shadow(0 1.4rem 2rem rgba(0, 0, 0, 0.35));
+}
+
+/* The floor shadow stays put while the camera floats, and tightens as the
+   camera dips, so the float reads as height above a surface. */
+.camera::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -7%;
+  height: 9%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.25) 55%, transparent);
+  animation: floor-shadow 5.5s ease-in-out infinite alternate;
+}
+
+@keyframes floor-shadow {
+  from {
+    opacity: 0.95;
+    transform: scaleX(1);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: scaleX(0.96);
+  }
+}
+
+.counter-digit {
+  font-family: var(--engrave);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  fill: var(--accent);
+}
+
+.camera[data-away='true'] {
+  visibility: hidden;
+}
+
+.shutter {
+  position: absolute;
+  left: var(--shutter-left);
+  top: var(--shutter-top);
+  width: var(--shutter-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #fdfcfa, #ebe7e0 60%, #d6d1c8);
+  box-shadow:
+    0 0 0 0.12rem var(--accent),
+    inset 0 -0.12rem 0.2rem rgba(60, 55, 48, 0.18),
+    0 0.12rem 0.2rem rgba(0, 0, 0, 0.22);
+  transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
+}
+
+.shutter:active {
+  transform: scale(0.94);
+  box-shadow:
+    0 0 0 0.12rem var(--accent),
+    inset 0 0.08rem 0.18rem rgba(60, 55, 48, 0.3);
+}
+
+.shutter:focus-visible {
+  outline-color: var(--ink);
+}
+
+.flash-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background: #fffdf6;
+  animation: flash-burst 520ms ease-out both;
+}
+
+@keyframes flash-burst {
+  from {
+    opacity: 0.85;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 .lens {
-  position: relative;
-  width: min(78vmin, 40rem);
+  position: absolute;
+  left: var(--lens-left);
+  top: var(--lens-top);
+  width: var(--lens-size);
   aspect-ratio: 1;
   border-radius: 50%;
+  container-type: inline-size;
   touch-action: none;
   user-select: none;
   cursor: grab;
   outline: none;
+}
+
+/* A static layer, so turning the ring never re-renders a filter. The lens
+   stands proud of the body: a tight contact shadow under a soft one. */
+.lens::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 0.06rem rgba(40, 36, 30, 0.12),
+    0 0.06rem 0.2rem rgba(40, 36, 30, 0.22),
+    0 0.2rem 0.9rem rgba(40, 36, 30, 0.14);
 }
 
 .lens:focus-visible {
@@ -85,7 +256,7 @@
 }
 
 .barrel-knurl line {
-  stroke: rgba(10, 11, 12, 0.5);
+  stroke: rgba(60, 55, 48, 0.24);
   stroke-width: 0.55;
 }
 
@@ -94,18 +265,18 @@
 }
 
 .tick-minor {
-  stroke: #7d7264;
+  stroke: #78726a;
   stroke-width: 0.3;
 }
 
 .tick-major {
-  stroke: #d9d1c0;
+  stroke: #2b2926;
   stroke-width: 0.6;
 }
 
 .stop-mark {
   pointer-events: auto;
-  fill: #b9ae9d;
+  fill: #4a4640;
   cursor: pointer;
   text-decoration: none;
 }
@@ -123,13 +294,13 @@
 }
 
 .nameplate {
-  fill: #8f8574;
+  fill: #6e6961;
   font-weight: 600;
   letter-spacing: 0.2em;
 }
 
 .nameplate-dot {
-  fill: #c78e5a;
+  fill: var(--accent);
 }
 
 .stop-mm {
@@ -142,7 +313,7 @@
 }
 
 .stop-mark.is-live {
-  fill: var(--paper);
+  fill: var(--ink);
 }
 
 /* The default outline is the link's rectangular bounding box, which cuts
@@ -152,8 +323,8 @@
 }
 
 .stop-mark:focus-visible .stop-hit {
-  fill: rgba(243, 239, 230, 0.08);
-  stroke: var(--paper);
+  fill: rgba(28, 25, 21, 0.06);
+  stroke: var(--ink);
   stroke-width: 0.3;
 }
 
@@ -163,12 +334,12 @@
 
 .index-window {
   fill: none;
-  stroke: rgba(243, 239, 230, 0.7);
+  stroke: rgba(29, 28, 26, 0.35);
   stroke-width: 0.45;
 }
 
 .index-dot {
-  fill: var(--paper);
+  fill: var(--accent);
 }
 
 .glass-art,
@@ -197,11 +368,45 @@
   overflow: hidden;
   border-radius: 50%;
   /* Light falls off toward the edge of a real finder. */
-  background: radial-gradient(circle closest-side, var(--paper) 72%, #e3dccd 100%);
+  background: radial-gradient(circle closest-side, var(--paper) 72%, #e4e0d8 100%);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px rgba(28, 25, 21, 0.16), inset 0 0 1.4rem rgba(28, 25, 21, 0.1);
+  /* A recess lit from above: shade under the top lip, a catch-light on the lower edge. */
+  box-shadow:
+    inset 0 0 0 1px rgba(29, 28, 26, 0.18),
+    inset 0 0.08rem 0.5rem rgba(29, 28, 26, 0.12),
+    inset 0 0 1.4rem rgba(29, 28, 26, 0.08);
   cursor: auto;
   touch-action: pan-y;
+}
+
+/* Now and then light catches the glass. */
+.viewfinder::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.32) 47%,
+    rgba(255, 255, 255, 0.08) 52%,
+    transparent 60%
+  );
+  mix-blend-mode: soft-light;
+  translate: -70% 0;
+  animation: glass-glint 9s ease-in-out 2s infinite;
+}
+
+@keyframes glass-glint {
+  0%,
+  82% {
+    translate: -70% 0;
+  }
+
+  100% {
+    translate: 70% 0;
+  }
 }
 
 .viewfinder-panel {
@@ -259,7 +464,7 @@
   inset: 0;
   pointer-events: none;
   font-family: var(--engrave);
-  font-size: clamp(0.5rem, 1.3vmin, 0.68rem);
+  font-size: max(0.42rem, 2.6cqi);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -277,6 +482,12 @@
   justify-content: center;
   gap: 1.1em;
   line-height: 1;
+}
+
+/* Tracking adds space after the last glyph; cancel it so the row centres on its ink. */
+.hud-top > :last-child,
+.hud-bottom > :last-child {
+  margin-right: -0.14em;
 }
 
 .hud-top {
@@ -345,33 +556,15 @@
 }
 
 .finder-rest h1 {
-  margin: 0 0 0.55rem;
-  font-size: clamp(1.7rem, 6vmin, 3.4rem);
+  margin: 0;
+  font-size: 11cqi;
   font-weight: 600;
   letter-spacing: -0.05em;
-  line-height: 0.88;
+  line-height: 0.9;
 }
 
 .finder-rest h1 span {
   display: block;
-}
-
-.lede {
-  margin: 0;
-  font-size: clamp(0.92rem, 2.2vmin, 1.15rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--ink-soft);
-}
-
-.finder-hint {
-  margin: 1rem 0 0;
-  font-family: var(--engrave);
-  font-size: clamp(0.58rem, 1.4vmin, 0.72rem);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
 }
 
 .finder-subject {
@@ -386,265 +579,45 @@
 }
 
 .subject-title {
-  font-size: clamp(1.5rem, 5.4vmin, 3rem);
+  font-size: 8.4cqi;
   font-weight: 600;
   letter-spacing: -0.05em;
   line-height: 0.95;
   text-wrap: balance;
 }
 
-.finder-subject .finder-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
-.finder-subject .finder-hint::after {
-  content: '+';
-  font-size: 1.3em;
-  line-height: 0;
-  transition: transform 160ms var(--ease-out);
-}
-
-/* Detail sheet: a printed card that sits over the stage. */
-.sheet {
-  width: min(32rem, calc(100vw - 2rem));
-  max-height: min(80svh, 40rem);
-  padding: 0;
-  border: 0;
-  border-radius: 1rem;
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.55);
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-
-.sheet[open] {
-  animation: sheet-in 280ms var(--ease-out);
-}
-
-.sheet::backdrop {
-  background: rgba(10, 9, 8, 0.62);
-  backdrop-filter: blur(6px);
-}
-
-@keyframes sheet-in {
-  from {
-    opacity: 0;
-    transform: translateY(1.25rem) scale(0.98);
-  }
-}
-
-.sheet-inner {
-  padding: 1.1rem 1.5rem 1.75rem;
-}
-
-.sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.sheet-spec {
-  display: flex;
-  gap: 1.1em;
-  margin: 0;
-  font-family: var(--engrave);
-  font-size: 0.72rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-
-.sheet-close {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  margin-right: -0.4rem;
-  border-radius: 50%;
-  font-size: 1.35rem;
-  line-height: 1;
-  color: var(--ink-soft);
-  transition: background-color 160ms ease, transform 160ms var(--ease-out);
-}
-
-.sheet-close:active {
-  transform: scale(0.94);
-}
-
-.sheet h2 {
-  margin: 0 0 0.9rem;
-  font-size: clamp(1.6rem, 5vw, 2.1rem);
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 1.05;
-}
-
-.sheet-body p {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.sheet-list,
-.sheet-photos {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.sheet-list li {
-  padding: 0.8rem 0;
-  border-top: 1px solid var(--line);
-}
-
-.sheet-list li:last-child,
-.sheet-photos li:last-child {
-  padding-bottom: 0;
-}
-
-.sheet-link,
-.sheet-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-}
-
-.sheet-link {
-  transition: color 160ms ease;
-}
-
-.sheet-link::after {
-  content: '↗';
-  font-size: 0.78em;
-}
-
-.sheet-list p,
-.sheet-photos p {
-  margin-top: 0.2rem;
-}
-
-.sheet-photos li {
-  display: grid;
-  grid-template-columns: 3.4rem 1fr;
-  gap: 0.9rem;
-  align-items: center;
-  padding: 0.7rem 0;
-  border-top: 1px solid var(--line);
-}
-
-.sheet-photos h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-}
-
-/* Styled as a 35mm slide mount. */
-.photo-chip {
-  width: 3.4rem;
-  height: 3.4rem;
-  border: 0.4rem solid #fbf9f4;
-  border-radius: 0.25rem;
-  box-shadow: 0 0 0 1px var(--line), 0 1px 3px rgba(28, 25, 21, 0.18);
-}
-
-.tone-japan {
-  background: linear-gradient(165deg, #1c2740 0%, #9a3f12 100%);
-}
-
-.tone-southwest {
-  background: linear-gradient(160deg, #c4783a 0%, #3d2116 100%);
-}
-
-.tone-acadia {
-  background: linear-gradient(170deg, #1e3a32 0%, #8ba3b0 100%);
-}
-
-.sheet-email {
-  display: inline-block;
-  margin-top: 1rem;
-  font-size: clamp(1.15rem, 4.5vw, 1.5rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  transition: color 160ms ease, transform 160ms var(--ease-out);
-}
-
-.sheet-email:active {
-  transform: scale(0.97);
-}
-
-.sheet-body .sheet-foot {
-  margin-top: 0.8rem;
-  font-size: 0.8rem;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .stop-mark:hover {
-    fill: var(--paper);
-  }
-
-  .finder-subject:hover .finder-hint::after {
-    transform: rotate(90deg);
-  }
-
-  .sheet-close:hover {
-    background: var(--line);
-  }
-
-  .sheet-link:hover,
-  .sheet-email:hover {
-    color: var(--accent);
+    fill: var(--ink);
   }
 }
+
+/* The lens sits inside the camera body at about half its old size, so the
+   engraving needs a bigger relative size to stay legible. Values in SVG
+   user units. */
+.stop-mm {
+  font-size: 4.6px;
+}
+
+.stop-label,
+.nameplate {
+  font-size: 3px;
+  letter-spacing: 0.1em;
+}
+
 @media (max-width: 640px) {
-  .stage {
+  .release-stage {
     padding: 0.6rem;
   }
 
-  /* On phones the sheet rises from the bottom edge. */
-  .sheet {
-    width: 100%;
-    max-width: 100%;
-    max-height: 85svh;
-    margin: auto 0 0;
-    border-radius: 1rem 1rem 0 0;
-  }
-
-  .sheet[open] {
-    animation-name: sheet-up;
-  }
-
-  @keyframes sheet-up {
-    from {
-      transform: translateY(100%);
-    }
-  }
-
-  .lens {
-    width: min(94vmin, 40rem);
-  }
-
-  /* The engraving scales with the barrel, so it needs a bigger relative
-     size to stay legible on a small lens. Values in SVG user units. */
   .stop-mm {
-    font-size: 4.1px;
+    font-size: 5.2px;
   }
 
   .stop-label,
   .nameplate {
-    font-size: 2.7px;
-    letter-spacing: 0.12em;
+    font-size: 3.3px;
+    letter-spacing: 0.06em;
   }
 
   .tick-minor {
@@ -662,8 +635,18 @@
     transition: none;
   }
 
-  .viewfinder-panel,
-  .sheet[open] {
+  .viewfinder-panel {
+    animation: none;
+  }
+
+  .shutter {
+    transition: none;
+  }
+
+  .camera::before,
+  .camera-idle,
+  .ready-light,
+  .viewfinder::after {
     animation: none;
   }
 }

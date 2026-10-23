@@ -1,11 +1,11 @@
-import LensInstrument from './lens/LensInstrument';
+import InstaxCamera from './instax/InstaxCamera';
 import './App.css';
 
 function App() {
   return (
     <div className="app">
       <div className="grain" aria-hidden="true" />
-      <LensInstrument />
+      <InstaxCamera />
     </div>
   );
 }

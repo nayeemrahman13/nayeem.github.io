@@ -8,22 +8,14 @@ function Rest() {
         <span>{first}</span>
         <span>{rest.join(' ')}</span>
       </h1>
-      <p className="lede">{subjects.rest.line}</p>
-      <p className="finder-hint">Turn the ring to zoom</p>
     </div>
   );
 }
 
 function Subject({ stop, onOpen }) {
   return (
-    <button
-      type="button"
-      className="finder-frame finder-subject"
-      aria-haspopup="dialog"
-      onClick={onOpen}
-    >
+    <button type="button" className="finder-frame finder-subject" onClick={onOpen}>
       <span className="subject-title">{subjects[stop.id].title}</span>
-      <span className="finder-hint">Look closer</span>
     </button>
   );
 }

@@ -11,8 +11,11 @@ import {
 
 const RUBBER_RANGE = 56;
 const WHEEL_IDLE_MS = 90;
-const SPRING_STIFFNESS = 38;
-const SPRING_DAMPING = 11;
+// Apple's rotation spring: damping ratio 0.85, response 0.45s.
+const SPRING_RESPONSE = 0.45;
+const SPRING_DAMPING_RATIO = 0.85;
+const SPRING_STIFFNESS = (2 * Math.PI / SPRING_RESPONSE) ** 2;
+const SPRING_DAMPING = 2 * SPRING_DAMPING_RATIO * Math.sqrt(SPRING_STIFFNESS);
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -94,16 +97,21 @@ export function useZoomRing() {
       }
 
       let pos = rotationRef.current;
-      let vel = (dragRef.current?.velocity ?? 0) * 0.35;
+      let vel = dragRef.current?.velocity ?? 0;
       let last = performance.now();
       cancelAnimationFrame(springRef.current);
 
       const step = (now) => {
-        const dt = Math.min(0.032, (now - last) / 1000);
+        // Fixed 4ms substeps keep the stiffer spring stable on slow frames.
+        let remaining = Math.min(0.05, (now - last) / 1000);
         last = now;
-        vel += ((target - pos) * SPRING_STIFFNESS - vel * SPRING_DAMPING) * dt;
-        pos += vel * dt;
-        if (Math.abs(target - pos) < 0.08 && Math.abs(vel) < 0.5) {
+        while (remaining > 0) {
+          const dt = Math.min(0.004, remaining);
+          vel += ((target - pos) * SPRING_STIFFNESS - vel * SPRING_DAMPING) * dt;
+          pos += vel * dt;
+          remaining -= dt;
+        }
+        if (Math.abs(target - pos) < 0.05 && Math.abs(vel) < 0.5) {
           setRotationNow(target);
           return;
         }
@@ -200,10 +208,12 @@ export function useZoomRing() {
   const onWheel = useCallback(
     (event) => {
       if (event.target.closest('.viewfinder')) return;
+      // Vertical scroll belongs to the page, which pulls the print out.
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
       event.preventDefault();
       cancelAnimationFrame(springRef.current);
       const next = rubberband(
-        rotationRef.current - event.deltaY * 0.12,
+        rotationRef.current - event.deltaX * 0.12,
         MIN_ROTATION,
         MAX_ROTATION,
       );
