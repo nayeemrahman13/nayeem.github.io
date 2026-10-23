@@ -1,10 +1,11 @@
 :root {
-  --stage: #161310;
-  --paper: #f3efe6;
-  --ink: #1c1915;
-  --ink-soft: #5c564e;
-  --line: rgba(28, 25, 21, 0.12);
-  --accent: #9a3f12;
+  --stage: #1a1918;
+  --paper: #f4f2ee;
+  --ink: #1d1c1a;
+  --ink-soft: #5e5b56;
+  --line: rgba(29, 28, 26, 0.12);
+  /* The one hue in the interface: counter, ready light, stamp, focus dot. */
+  --accent: #d0652b;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --engrave: "DIN Alternate", Bahnschrift, "DIN 2014", "Barlow", system-ui, sans-serif;
 

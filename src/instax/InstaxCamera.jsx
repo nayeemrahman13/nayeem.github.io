@@ -2,29 +2,20 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Lens from '../lens/Lens';
 import { STOPS, stopIndex } from '../lens/stops';
 import { useZoomRing } from '../lens/useZoomRing';
-import { MINI, WIDE } from './body';
+import { MINI } from './body';
 import MiniBody from './MiniBody';
 import Print from './Print';
-import WideBody from './WideBody';
-import { useFormat } from './useFormat';
 import { useRelease } from './useRelease';
-
-const FORMATS = {
-  mini: { geometry: MINI, Body: MiniBody },
-  wide: { geometry: WIDE, Body: WideBody },
-};
 
 export default function InstaxCamera() {
   const ring = useZoomRing();
   const { activeStop, reduceMotion, selectStop } = ring;
-  const format = useFormat();
-  const { geometry, Body } = FORMATS[format];
   const hasPrint = activeStop.id !== 'rest';
   const { trackRef, anchorRef, cameraRef, printRef, scrollRef, developRef, release, retract } = useRelease({
     enabled: hasPrint,
     reduceMotion,
-    resetKey: `${activeStop.id}-${format}`,
-    slot: geometry.slot,
+    resetKey: activeStop.id,
+    slot: MINI.slot,
   });
   const [flashKey, setFlashKey] = useState(0);
   const releaseAfterTurn = useRef(false);
@@ -76,7 +67,7 @@ export default function InstaxCamera() {
   };
 
   return (
-    <div className="instax" data-print={hasPrint} data-format={format}>
+    <div className="instax" data-print={hasPrint}>
       <a className="skip-link" href="#stop-about">
         Skip to topics
       </a>
@@ -90,10 +81,10 @@ export default function InstaxCamera() {
 
       <section className="release-track" ref={trackRef}>
         <div className="release-stage">
-          <div className="camera-anchor" ref={anchorRef} style={geometry.vars}>
+          <div className="camera-anchor" ref={anchorRef} style={MINI.vars}>
             <div className="camera" ref={cameraRef}>
               <div className="camera-idle">
-                <Body counter={stopIndex(activeStop) + 1} />
+                <MiniBody counter={stopIndex(activeStop) + 1} />
                 <Lens ring={ring} onOpen={shoot} />
                 <button type="button" className="shutter" aria-label="Take the picture" onClick={shoot} />
               </div>

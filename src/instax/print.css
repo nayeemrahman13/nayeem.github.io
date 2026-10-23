@@ -2,7 +2,6 @@
    it down from the top-left corner to sit in the camera's slot. */
 .print {
   --hand: "Bradley Hand", "Segoe Print", "Marker Felt", "Comic Sans MS", cursive;
-  --lifted: 0;
   position: absolute;
   z-index: 10;
   top: 0.75rem;
@@ -15,18 +14,28 @@
   grid-template-rows: 1fr auto;
   padding: clamp(0.7rem, 3.5vw, 1.6rem) clamp(0.7rem, 3.5vw, 1.6rem) 0;
   border-radius: 0.35rem;
-  background: #fbfaf5;
+  background: #fcfbf9;
   color: var(--ink);
   transform-origin: 0 0;
   will-change: transform;
+  background-image: linear-gradient(170deg, #fff 0%, #fcfbf9 40%, #f3f1ec 100%);
   box-shadow:
-    0 0 0 1px rgba(28, 25, 21, 0.06),
-    0 calc(0.3rem + var(--lifted) * 1.4rem) calc(0.6rem + var(--lifted) * 2.8rem) rgba(0, 0, 0, 0.42);
+    0 0 0 1px rgba(29, 28, 26, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0.15rem 0.3rem rgba(0, 0, 0, 0.28);
 }
 
-/* Instax Wide prints are landscape, about 4:3 including the frame. */
-.instax[data-format='wide'] .print {
-  width: min(calc(100vw - 3rem), calc((100svh - 1.5rem) * 1.32), 72rem);
+/* The lift shadow only fades, so scrolling never repaints the print. */
+.print-lift {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    0 0.8rem 1.6rem rgba(0, 0, 0, 0.22),
+    0 2.4rem 4.8rem -0.6rem rgba(0, 0, 0, 0.5);
+  will-change: opacity;
 }
 
 .print:not([data-out='true']) {
@@ -37,7 +46,7 @@
   position: relative;
   overflow: hidden;
   border-radius: 0.15rem;
-  background: radial-gradient(120% 90% at 40% 30%, var(--paper) 55%, #e5ddcc 100%);
+  background: radial-gradient(120% 90% at 40% 30%, var(--paper) 55%, #e6e2da 100%);
 }
 
 .print-scroll {
@@ -65,7 +74,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(165deg, #cdd5d9 0%, #b9c3c9 55%, #aab4ba 100%);
+  background: linear-gradient(165deg, #d2d0cc 0%, #c0bdb8 55%, #b1aea8 100%);
   will-change: opacity;
 }
 
@@ -90,9 +99,9 @@
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #e0782f;
+  color: var(--accent);
   opacity: 0.85;
-  text-shadow: 0 0 0.35rem rgba(224, 120, 47, 0.35);
+  text-shadow: 0 0 0.35rem rgba(208, 101, 43, 0.3);
   pointer-events: none;
 }
 
@@ -145,7 +154,7 @@
   font-size: clamp(1.35rem, 5vw, 2.2rem);
   font-weight: 400;
   letter-spacing: 0;
-  color: #27304a;
+  color: var(--ink);
   rotate: -1.5deg;
 }
 
@@ -217,7 +226,7 @@
   width: clamp(5.5rem, 24vw, 8.5rem);
   margin: 0;
   padding: 6% 6% 0;
-  background: #fbfaf5;
+  background: #fcfbf9;
   border-radius: 0.15rem;
   box-shadow: 0 0 0 1px rgba(28, 25, 21, 0.06), 0 0.35rem 0.8rem rgba(28, 25, 21, 0.2);
   rotate: -2deg;
@@ -236,7 +245,7 @@
   font-family: var(--hand);
   font-size: 0.8rem;
   text-align: center;
-  color: #27304a;
+  color: var(--ink);
 }
 
 .tone-japan {

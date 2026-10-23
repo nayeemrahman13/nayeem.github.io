@@ -59,6 +59,10 @@
   display: grid;
   place-items: center;
   padding: 1rem;
+  /* A soft key light behind the camera, so the stage has depth, not a flat fill. */
+  background:
+    radial-gradient(ellipse 60% 52% at 50% 42%, rgba(255, 248, 238, 0.07), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.35));
 }
 
 .camera-anchor {
@@ -66,9 +70,6 @@
   width: min(92vw, calc(66svh * 68 / 74), 34rem);
 }
 
-.instax[data-format='wide'] .camera-anchor {
-  width: min(72vw, calc(66svh * 73 / 45), 62rem);
-}
 
 .camera {
   position: absolute;
@@ -94,7 +95,7 @@
 }
 
 .ready-light {
-  fill: #e0782f;
+  fill: var(--accent);
   animation: ready-blink 2.8s ease-in-out infinite;
 }
 
@@ -115,14 +116,40 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 1.6rem 2.2rem rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 0.2rem 0.3rem rgba(0, 0, 0, 0.3)) drop-shadow(0 1.4rem 2rem rgba(0, 0, 0, 0.35));
+}
+
+/* The floor shadow stays put while the camera floats, and tightens as the
+   camera dips, so the float reads as height above a surface. */
+.camera::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -7%;
+  height: 9%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.25) 55%, transparent);
+  animation: floor-shadow 5.5s ease-in-out infinite alternate;
+}
+
+@keyframes floor-shadow {
+  from {
+    opacity: 0.95;
+    transform: scaleX(1);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: scaleX(0.96);
+  }
 }
 
 .counter-digit {
   font-family: var(--engrave);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  fill: #e0782f;
+  fill: var(--accent);
 }
 
 .camera[data-away='true'] {
@@ -136,14 +163,19 @@
   width: var(--shutter-size);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 32%, #3c6e66, #29504b 62%, #1f3d39);
-  box-shadow: inset 0 -0.12rem 0.2rem rgba(0, 0, 0, 0.3), 0 0.1rem 0.15rem rgba(0, 0, 0, 0.25);
+  background: radial-gradient(circle at 38% 32%, #fdfcfa, #ebe7e0 60%, #d6d1c8);
+  box-shadow:
+    0 0 0 0.12rem var(--accent),
+    inset 0 -0.12rem 0.2rem rgba(60, 55, 48, 0.18),
+    0 0.12rem 0.2rem rgba(0, 0, 0, 0.22);
   transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
 }
 
 .shutter:active {
-  transform: scale(0.9);
-  box-shadow: inset 0 0.08rem 0.18rem rgba(0, 0, 0, 0.4);
+  transform: scale(0.94);
+  box-shadow:
+    0 0 0 0.12rem var(--accent),
+    inset 0 0.08rem 0.18rem rgba(60, 55, 48, 0.3);
 }
 
 .shutter:focus-visible {
@@ -181,7 +213,20 @@
   user-select: none;
   cursor: grab;
   outline: none;
-  filter: drop-shadow(0 0.35rem 0.5rem rgba(0, 0, 0, 0.35));
+}
+
+/* A static layer, so turning the ring never re-renders a filter. The lens
+   stands proud of the body: a tight contact shadow under a soft one. */
+.lens::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 0.06rem rgba(40, 36, 30, 0.12),
+    0 0.06rem 0.2rem rgba(40, 36, 30, 0.22),
+    0 0.2rem 0.9rem rgba(40, 36, 30, 0.14);
 }
 
 .lens:focus-visible {
@@ -211,7 +256,7 @@
 }
 
 .barrel-knurl line {
-  stroke: rgba(10, 11, 12, 0.5);
+  stroke: rgba(60, 55, 48, 0.24);
   stroke-width: 0.55;
 }
 
@@ -220,18 +265,18 @@
 }
 
 .tick-minor {
-  stroke: #7d7264;
+  stroke: #78726a;
   stroke-width: 0.3;
 }
 
 .tick-major {
-  stroke: #d9d1c0;
+  stroke: #2b2926;
   stroke-width: 0.6;
 }
 
 .stop-mark {
   pointer-events: auto;
-  fill: #b9ae9d;
+  fill: #4a4640;
   cursor: pointer;
   text-decoration: none;
 }
@@ -249,13 +294,13 @@
 }
 
 .nameplate {
-  fill: #8f8574;
+  fill: #6e6961;
   font-weight: 600;
   letter-spacing: 0.2em;
 }
 
 .nameplate-dot {
-  fill: #c78e5a;
+  fill: var(--accent);
 }
 
 .stop-mm {
@@ -268,7 +313,7 @@
 }
 
 .stop-mark.is-live {
-  fill: var(--paper);
+  fill: var(--ink);
 }
 
 /* The default outline is the link's rectangular bounding box, which cuts
@@ -278,8 +323,8 @@
 }
 
 .stop-mark:focus-visible .stop-hit {
-  fill: rgba(243, 239, 230, 0.08);
-  stroke: var(--paper);
+  fill: rgba(28, 25, 21, 0.06);
+  stroke: var(--ink);
   stroke-width: 0.3;
 }
 
@@ -289,12 +334,12 @@
 
 .index-window {
   fill: none;
-  stroke: rgba(243, 239, 230, 0.7);
+  stroke: rgba(29, 28, 26, 0.35);
   stroke-width: 0.45;
 }
 
 .index-dot {
-  fill: var(--paper);
+  fill: var(--accent);
 }
 
 .glass-art,
@@ -323,9 +368,13 @@
   overflow: hidden;
   border-radius: 50%;
   /* Light falls off toward the edge of a real finder. */
-  background: radial-gradient(circle closest-side, var(--paper) 72%, #e3dccd 100%);
+  background: radial-gradient(circle closest-side, var(--paper) 72%, #e4e0d8 100%);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px rgba(28, 25, 21, 0.16), inset 0 0 1.4rem rgba(28, 25, 21, 0.1);
+  /* A recess lit from above: shade under the top lip, a catch-light on the lower edge. */
+  box-shadow:
+    inset 0 0 0 1px rgba(29, 28, 26, 0.18),
+    inset 0 0.08rem 0.5rem rgba(29, 28, 26, 0.12),
+    inset 0 0 1.4rem rgba(29, 28, 26, 0.08);
   cursor: auto;
   touch-action: pan-y;
 }
@@ -435,6 +484,12 @@
   line-height: 1;
 }
 
+/* Tracking adds space after the last glyph; cancel it so the row centres on its ink. */
+.hud-top > :last-child,
+.hud-bottom > :last-child {
+  margin-right: -0.14em;
+}
+
 .hud-top {
   top: 7.5%;
 }
@@ -501,33 +556,15 @@
 }
 
 .finder-rest h1 {
-  margin: 0 0 0.35em;
-  font-size: 9.5cqi;
+  margin: 0;
+  font-size: 11cqi;
   font-weight: 600;
   letter-spacing: -0.05em;
-  line-height: 0.88;
+  line-height: 0.9;
 }
 
 .finder-rest h1 span {
   display: block;
-}
-
-.lede {
-  margin: 0;
-  font-size: max(0.62rem, 4cqi);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--ink-soft);
-}
-
-.finder-hint {
-  margin: 0.9em 0 0;
-  font-family: var(--engrave);
-  font-size: max(0.5rem, 3cqi);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
 }
 
 .finder-subject {
@@ -549,36 +586,10 @@
   text-wrap: balance;
 }
 
-.finder-subject .finder-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
-/* A small viewfinder has no room for the hint; the nudging print does
-   the inviting instead. */
-@container (max-width: 260px) {
-  .finder-subject .finder-hint {
-    display: none;
-  }
-}
-
-.finder-subject .finder-hint::after {
-  content: '+';
-  font-size: 1.3em;
-  line-height: 0;
-  transition: transform 160ms var(--ease-out);
-}
-
 @media (hover: hover) and (pointer: fine) {
   .stop-mark:hover {
-    fill: var(--paper);
+    fill: var(--ink);
   }
-
-  .finder-subject:hover .finder-hint::after {
-    transform: rotate(90deg);
-  }
-
 }
 
 /* The lens sits inside the camera body at about half its old size, so the
@@ -632,6 +643,7 @@
     transition: none;
   }
 
+  .camera::before,
   .camera-idle,
   .ready-light,
   .viewfinder::after {

@@ -15,6 +15,7 @@ export default function Print({ stop, printRef, scrollRef, developRef, onFocus, 
       onFocus={onFocus}
       onClick={onClick}
     >
+      <div className="print-lift" aria-hidden="true" />
       <div className="print-photo">
         <div className="print-scroll" ref={scrollRef}>
           <PrintContent stop={stop} />

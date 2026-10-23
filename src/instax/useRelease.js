@@ -12,6 +12,9 @@ const NUDGE_EVERY_MS = 4200;
 const PRINT_TO_SLOT = 0.94;
 const SCREEN_GAP = 16;
 const OUT_AT = 0.995;
+const LIFT_TILT_DEG = 4;
+const PERSPECTIVE_PX = 1800;
+const CAMERA_RECEDE = 0.9;
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
 const lerp = (from, to, t) => from + (to - from) * t;
@@ -96,13 +99,18 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
     const y = lerp(pullY, finalTop, lifted);
     const scale = lerp(startScale, 1, lifted);
     const hidden = Math.max(0, (slotY + cameraY - y) / scale);
+    // Mid-lift the print tips its lower edge toward the viewer and the
+    // camera falls back, so the hand-off reads as depth, not a slide.
+    const tilt = LIFT_TILT_DEG * Math.sin(Math.PI * lifted);
+    const recede = lerp(1, CAMERA_RECEDE, lifted);
 
     camera.style.opacity = '';
-    camera.style.transform = `translate3d(0, ${cameraY.toFixed(2)}px, 0)`;
+    camera.style.transform = `translate3d(0, ${cameraY.toFixed(2)}px, 0) scale(${recede.toFixed(4)})`;
     print.style.opacity = '';
-    print.style.transform = `translate3d(${(x - finalLeft).toFixed(2)}px, ${(y - finalTop).toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+    print.style.transform = `translate3d(${(x - finalLeft).toFixed(2)}px, ${(y - finalTop).toFixed(2)}px, 0) scale(${scale.toFixed(4)}) translateX(${finalW / 2}px) perspective(${PERSPECTIVE_PX}px) rotateX(${tilt.toFixed(3)}deg) translateX(${-finalW / 2}px)`;
     print.style.clipPath = hidden > 0 ? `inset(${hidden.toFixed(2)}px 0 0 0)` : 'none';
-    print.style.setProperty('--lifted', lifted.toFixed(3));
+    const shadow = print.firstElementChild;
+    if (shadow) shadow.style.opacity = lifted.toFixed(3);
     if (developRef.current) {
       developRef.current.style.opacity = String(1 - smoothstep(0.08, 0.92, p));
     }

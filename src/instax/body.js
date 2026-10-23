@@ -31,10 +31,3 @@ export const MINI = describe({
   slot: { cx: 40, y: 70.25, w: 44 },
   shutter: { cx: 64.5, cy: 31.29, r: 3.78 },
 });
-
-export const WIDE = describe({
-  box: { x: 4, y: 17.5, w: 73, h: 45 },
-  lens: { cx: 32.56, cy: 38.77, r: 12.1 },
-  slot: { cx: 38.4, y: 56.77, w: 43.13 },
-  shutter: { cx: 62.98, cy: 32.92, r: 2.734 },
-});

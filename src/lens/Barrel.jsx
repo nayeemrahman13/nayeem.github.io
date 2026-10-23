@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { APERTURE, FOCAL_RANGE, STOPS } from './stops';
 import {
   NAMEPLATE_HALF_SPAN,
@@ -27,25 +27,25 @@ function BodyRings() {
   return (
     <g className="barrel-body">
       <circle cx="50" cy="50" r={R.rim} fill="url(#barrel-face)" />
-      <circle cx="50" cy="50" r={R.rim} fill="none" stroke="#e0d8c4" strokeWidth="0.4" opacity="0.45" />
+      <circle cx="50" cy="50" r={R.rim} fill="none" stroke="#fdfcfa" strokeWidth="0.4" opacity="0.8" />
       <circle
         cx="50"
         cy="50"
         r={(R.bandOuter + R.bandInner) / 2}
         fill="none"
-        stroke="#26272a"
+        stroke="#ddd8cf"
         strokeWidth={R.bandOuter - R.bandInner}
       />
-      <circle cx="50" cy="50" r={R.bandOuter} fill="none" stroke="#0f1011" strokeWidth="0.3" opacity="0.8" />
-      <circle cx="50" cy="50" r={R.bandInner} fill="none" stroke="#0f1011" strokeWidth="0.3" opacity="0.8" />
+      <circle cx="50" cy="50" r={R.bandOuter} fill="none" stroke="#c2bcb2" strokeWidth="0.3" />
+      <circle cx="50" cy="50" r={R.bandInner} fill="none" stroke="#c2bcb2" strokeWidth="0.3" />
       <g className="barrel-knurl">{knurl}</g>
-      <circle cx="50" cy="50" r={R.bronze} fill="none" stroke="#c78e5a" strokeWidth="0.5" />
+      <circle cx="50" cy="50" r={R.bronze} fill="none" stroke="#b3ada3" strokeWidth="0.5" />
       <circle
         cx="50"
         cy="50"
         r={(R.coating + R.hole) / 2}
         fill="none"
-        stroke="#29504b"
+        stroke="#97918a"
         strokeWidth={R.coating - R.hole}
       />
     </g>
@@ -94,14 +94,14 @@ function Nameplate() {
   );
 }
 
-export default function Barrel({ liveStop, selectStop, didDragRef }) {
+export default memo(function Barrel({ liveStop, selectStop, didDragRef }) {
   return (
     <svg className="barrel-svg" viewBox="0 0 100 100">
       <defs>
         <radialGradient id="barrel-face" cx="36%" cy="28%" r="82%">
-          <stop offset="0" stopColor="#3c3d40" />
-          <stop offset="0.6" stopColor="#2c2d2e" />
-          <stop offset="1" stopColor="#1a1b1c" />
+          <stop offset="0" stopColor="#f6f4f0" />
+          <stop offset="0.55" stopColor="#e6e2db" />
+          <stop offset="1" stopColor="#d2cdc4" />
         </radialGradient>
         {STOPS.map((stop) => (
           <Fragment key={stop.id}>
@@ -161,4 +161,4 @@ export default function Barrel({ liveStop, selectStop, didDragRef }) {
       })}
     </svg>
   );
-}
+});

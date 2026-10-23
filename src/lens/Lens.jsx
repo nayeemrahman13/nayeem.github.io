@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Barrel from './Barrel';
 import IndexMark from './IndexMark';
 import Viewfinder from './Viewfinder';
@@ -8,7 +8,7 @@ import { stopIndex } from './stops';
 
 const IRIS_MS = 220;
 
-function IrisBlades({ closed }) {
+const IrisBlades = memo(function IrisBlades({ closed }) {
   const blades = Array.from({ length: 8 }, (_, index) => (
     <path
       key={index}
@@ -23,7 +23,7 @@ function IrisBlades({ closed }) {
       {blades}
     </svg>
   );
-}
+});
 
 function OptionalArt({ className, src, onReady }) {
   const [visible, setVisible] = useState(true);
