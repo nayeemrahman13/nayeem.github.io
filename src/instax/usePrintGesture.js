@@ -75,6 +75,7 @@ export function usePrintGesture({ enabled, reduceMotion, scrollRef, progressRef,
   useEffect(() => {
     if (!enabled) return undefined;
     const onWheel = (event) => {
+      if (event.ctrlKey) return;
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
       const discrete = event.deltaMode !== 0;
       const dy = discrete ? Math.sign(event.deltaY) * 100 : event.deltaY;
@@ -84,25 +85,37 @@ export function usePrintGesture({ enabled, reduceMotion, scrollRef, progressRef,
       event.preventDefault();
     };
     let touchY = null;
+    let touchSlop = 0;
     const onTouchStart = (event) => {
       if (event.touches.length !== 1 || event.target.closest('.lens')) {
         touchY = null;
         return;
       }
       touchY = event.touches[0].clientY;
+      touchSlop = 0;
     };
     const onTouchMove = (event) => {
       if (touchY == null || event.touches.length !== 1) return;
       const y = event.touches[0].clientY;
-      const dy = touchY - y;
+      const step = touchY - y;
       touchY = y;
-      if (!dy) return;
+      if (!step) return;
+      // A finger that slips a few pixels is still a tap. Claiming it here
+      // cancels the click on the shutter, the print, and Back.
+      let dy = step;
+      if (touchSlop !== null) {
+        touchSlop += step;
+        if (Math.abs(touchSlop) < 10) return;
+        dy = touchSlop;
+        touchSlop = null;
+      }
       const consumed = send({ dy, discrete: false });
       if (consumed === 'text' && scrollRef.current) scrollRef.current.scrollTop += dy;
       event.preventDefault();
     };
     const onTouchEnd = () => {
       touchY = null;
+      touchSlop = 0;
     };
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('touchstart', onTouchStart, { passive: true });

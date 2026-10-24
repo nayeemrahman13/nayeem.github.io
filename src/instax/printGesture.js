@@ -13,6 +13,7 @@ export function createGesture() {
     progress: 0,
     burstDy: 0,
     burstAt: 0,
+    textAt: 0,
     from: 0,
     to: 0,
     startedAt: 0,
@@ -37,6 +38,11 @@ export function play(state, to, now, reduceMotion = false) {
   const target = to >= 1 ? 1 : 0;
   if (Math.abs(state.progress - target) < 0.001) return settled(state, target);
   if (reduceMotion) return settled(state, target);
+  // Further input toward the same end must not restart the clock. The
+  // landing belongs to the play that is already running.
+  if ((state.phase === 'revealing' || state.phase === 'retracting') && state.to === target) {
+    return { ...state, burstDy: 0 };
+  }
   const distance = Math.abs(target - state.progress);
   return {
     ...state,
@@ -76,9 +82,14 @@ export function applyDelta(state, input) {
   if (!enabled || !dy) return { state, consumed: 'ignore' };
 
   if (state.phase === 'out') {
-    if (dy > 0 && canDown) return { state: { ...state, burstDy: 0 }, consumed: 'text' };
-    if (dy < 0 && canUp) return { state: { ...state, burstDy: 0 }, consumed: 'text' };
+    if (dy > 0 && canDown) return { state: { ...state, burstDy: 0, textAt: now }, consumed: 'text' };
+    if (dy < 0 && canUp) return { state: { ...state, burstDy: 0, textAt: now }, consumed: 'text' };
     if (dy > 0) return { state: { ...state, burstDy: 0 }, consumed: 'idle' };
+    // The tail of a flick that just reached the top is still that flick.
+    // Swallow it until the stream goes quiet, then a new upward gesture can retract.
+    if (state.textAt > 0 && now - state.textAt <= BURST_MS) {
+      return { state: { ...state, burstDy: 0, textAt: now }, consumed: 'idle' };
+    }
   }
 
   let burstDy = state.burstDy;
