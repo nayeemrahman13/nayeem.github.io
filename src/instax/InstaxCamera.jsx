@@ -5,30 +5,45 @@ import { useZoomRing } from '../lens/useZoomRing';
 import { MINI } from './body';
 import MiniBody from './MiniBody';
 import Print from './Print';
+import { usePrintGesture } from './usePrintGesture';
 import { useRelease } from './useRelease';
 
 export default function InstaxCamera() {
   const ring = useZoomRing();
   const { activeStop, reduceMotion, selectStop } = ring;
   const hasPrint = activeStop.id !== 'rest';
-  const { trackRef, anchorRef, cameraRef, printRef, scrollRef, developRef, release, retract } = useRelease({
+  const progressRef = useRef(0);
+  const { anchorRef, cameraRef, printRef, scrollRef, developRef, schedule } = useRelease({
     enabled: hasPrint,
     reduceMotion,
     resetKey: activeStop.id,
     slot: MINI.slot,
+    progressRef,
+  });
+  const { reveal, retract, snap } = usePrintGesture({
+    enabled: hasPrint,
+    reduceMotion,
+    scrollRef,
+    progressRef,
+    onProgress: schedule,
   });
   const [flashKey, setFlashKey] = useState(0);
   const releaseAfterTurn = useRef(false);
 
   // A new topic means a new print, so the old one goes back in.
   useEffect(() => {
-    if (releaseAfterTurn.current) {
-      releaseAfterTurn.current = false;
-      release();
+    if (!hasPrint) {
+      snap();
       return;
     }
-    if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
-  }, [activeStop.id, release, reduceMotion]);
+    if (releaseAfterTurn.current) {
+      releaseAfterTurn.current = false;
+      snap();
+      reveal();
+      return;
+    }
+    retract();
+  }, [activeStop.id, hasPrint, reveal, retract, snap]);
 
   const putBack = useCallback(() => {
     if (printRef.current?.contains(document.activeElement)) {
@@ -39,11 +54,11 @@ export default function InstaxCamera() {
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.key === 'Escape' && printRef.current?.dataset.out === 'true') putBack();
+      if (event.key === 'Escape') putBack();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [printRef, putBack]);
+  }, [putBack]);
 
   const shoot = () => {
     if (!reduceMotion) {
@@ -59,15 +74,15 @@ export default function InstaxCamera() {
       selectStop(STOPS[1]);
       return;
     }
-    release();
+    reveal();
   };
 
   const pullOnTap = () => {
-    if (printRef.current?.dataset.out !== 'true') release();
+    if (printRef.current?.dataset.out !== 'true') reveal();
   };
 
   return (
-    <div className="instax" data-print={hasPrint}>
+    <div className="instax">
       <a className="skip-link" href="#stop-about">
         Skip to topics
       </a>
@@ -79,7 +94,7 @@ export default function InstaxCamera() {
         ))}
       </nav>
 
-      <section className="release-track" ref={trackRef}>
+      <section className="release-track">
         <div className="release-stage">
           <div className="camera-anchor" ref={anchorRef} style={MINI.vars}>
             <div className="camera" ref={cameraRef}>

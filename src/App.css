@@ -40,15 +40,11 @@
   border: 0;
 }
 
-/* The track is only taller than the screen when there is a print to pull,
-   and its extra height is the distance the pull takes. */
+/* The print plays out over the stage. The page itself does not scroll. */
 .release-track {
   position: relative;
   height: 100svh;
-}
-
-.instax[data-print='true'] .release-track {
-  height: calc(100svh + 130svh);
+  overflow: hidden;
 }
 
 .release-stage {
