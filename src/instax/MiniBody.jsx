@@ -5,6 +5,24 @@ const LEFT_CHEEK =
 const RIGHT_CHEEK =
   "m69.5 22.38c-1.88 0.13-3.09 1.44-2.98 4.13 0.18 4.3-0.07 7.69-1.44 12.62-1.77 6.49-2.57 11.58-2.99 18.44-0.25 3.97-0.5 7.17-0.99 9.7-0.87 4.61-3.54 7.27-7.23 7.78 10.61-0.19 16.02-2.38 17.27-9.96 0.8-4.91 1.26-10.58 1.26-16.35 0-9.2-1.1-18.49-2.9-26.36z";
 
+const LEFT_SEAM =
+  "M27.8 75.05c-4.25-0.8-6.15-3.96-6.87-8.84-1.12-7.91-1.72-18.84-2.19-27.27-0.52-12.5-5.81-16.43-8.31-16.56";
+const RIGHT_SEAM =
+  "M69.5 22.38c-1.88 0.13-3.09 1.44-2.98 4.13 0.18 4.3-0.07 7.69-1.44 12.62-1.77 6.49-2.57 11.58-2.99 18.44-0.25 3.97-0.5 7.17-0.99 9.7-0.87 4.61-3.54 7.27-7.23 7.78";
+
+// The rounded edge where a side panel meets the front: a feathered shadow
+// inside the panel (three widening strokes) under a thin lit line.
+function Fillet({ clip, seam, light }) {
+  return (
+    <g clipPath={`url(#${clip})`} fill="none">
+      <path d={seam} stroke="url(#studio-panel-fillet-shade)" strokeWidth="1.8" opacity="0.28" />
+      <path d={seam} stroke="url(#studio-panel-fillet-shade)" strokeWidth="1.15" opacity="0.42" />
+      <path d={seam} stroke="url(#studio-panel-fillet-shade)" strokeWidth="0.7" opacity="0.65" />
+      <path d={seam} stroke={`url(#${light})`} strokeWidth="0.36" />
+    </g>
+  );
+}
+
 // Portrait body drawn with QuiverAI (Arrow 2 Telos studio-lighting pass on
 // instax-camera-soft.svg): key light from the upper left, a recessed lens
 // socket and shutter collar. The lens and shutter holes are clipped out
@@ -66,50 +84,114 @@ export default function MiniBody({ counter }) {
         <linearGradient
           id="studio-left-panel"
           gradientUnits="userSpaceOnUse"
-          x1="0"
-          y1="22.38"
-          x2="0"
-          y2="75.05"
+          x1="7.6"
+          y1="0"
+          x2="21"
+          y2="0"
         >
-          <stop offset="0%" stopColor="#DAD7D1" />
-          <stop offset="18%" stopColor="#E8E5DF" />
-          <stop offset="55%" stopColor="#D5D1CA" />
-          <stop offset="85%" stopColor="#C5C1BA" />
-          <stop offset="100%" stopColor="#ACA8A1" />
-        </linearGradient>
-        <linearGradient id="studio-left-edge" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.1" />
-          <stop offset="2.5%" stopColor="#FFFFFF" stopOpacity="0.65" />
-          <stop offset="6%" stopColor="#FFFFFF" stopOpacity="0.2" />
-          <stop offset="12%" stopColor="#FFFFFF" stopOpacity="0" />
-          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          <stop offset="0%" stopColor="#DDD8CF" />
+          <stop offset="7%" stopColor="#D5CFC5" />
+          <stop offset="19%" stopColor="#BEB7AC" />
+          <stop offset="29%" stopColor="#C2BBB0" />
+          <stop offset="43%" stopColor="#D7D1C7" />
+          <stop offset="63%" stopColor="#EEE9E0" />
+          <stop offset="80%" stopColor="#F7F3EB" />
+          <stop offset="100%" stopColor="#F2EEE6" />
         </linearGradient>
         <linearGradient
-          id="studio-right-panel"
+          id="studio-left-edge"
           gradientUnits="userSpaceOnUse"
           x1="0"
           y1="22.38"
           x2="0"
           y2="75.05"
         >
-          <stop offset="0%" stopColor="#CCC8C1" />
-          <stop offset="18%" stopColor="#DDD9D2" />
-          <stop offset="55%" stopColor="#CAC6BF" />
-          <stop offset="85%" stopColor="#BAB6AF" />
-          <stop offset="100%" stopColor="#A29E97" />
+          <stop offset="0%" stopColor="#FFFDFA" stopOpacity="0.28" />
+          <stop offset="20%" stopColor="#FFFDFA" stopOpacity="0.13" />
+          <stop offset="48%" stopColor="#FFFDFA" stopOpacity="0" />
+          <stop offset="70%" stopColor="#71695D" stopOpacity="0.02" />
+          <stop offset="83%" stopColor="#71695D" stopOpacity="0.1" />
+          <stop offset="92%" stopColor="#71695D" stopOpacity="0.27" />
+          <stop offset="97%" stopColor="#71695D" stopOpacity="0.43" />
+          <stop offset="100%" stopColor="#71695D" stopOpacity="0.52" />
+        </linearGradient>
+        <linearGradient
+          id="studio-right-panel"
+          gradientUnits="userSpaceOnUse"
+          x1="61"
+          y1="0"
+          x2="72.4"
+          y2="0"
+        >
+          <stop offset="0%" stopColor="#E7E1D7" />
+          <stop offset="20%" stopColor="#DED7CC" />
+          <stop offset="40%" stopColor="#CCC4B8" />
+          <stop offset="62%" stopColor="#B1A89B" />
+          <stop offset="77%" stopColor="#A69D90" />
+          <stop offset="87%" stopColor="#ACA396" />
+          <stop offset="95%" stopColor="#BDB4A7" />
+          <stop offset="100%" stopColor="#C4BBAF" />
         </linearGradient>
         <linearGradient
           id="studio-right-edge"
-          x1="0%"
-          y1="0%"
-          x2="100%"
-          y2="0%"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="22.38"
+          x2="0"
+          y2="75.05"
         >
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
-          <stop offset="88%" stopColor="#FFFFFF" stopOpacity="0" />
-          <stop offset="94%" stopColor="#FFFFFF" stopOpacity="0.1" />
-          <stop offset="97.5%" stopColor="#FFFFFF" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.05" />
+          <stop offset="0%" stopColor="#FFFDFA" stopOpacity="0.09" />
+          <stop offset="28%" stopColor="#FFFDFA" stopOpacity="0" />
+          <stop offset="65%" stopColor="#625A50" stopOpacity="0.02" />
+          <stop offset="81%" stopColor="#625A50" stopOpacity="0.1" />
+          <stop offset="91%" stopColor="#625A50" stopOpacity="0.24" />
+          <stop offset="97%" stopColor="#625A50" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#625A50" stopOpacity="0.49" />
+        </linearGradient>
+        <clipPath id="left-cheek">
+          <path d={LEFT_CHEEK} />
+        </clipPath>
+        <clipPath id="right-cheek">
+          <path d={RIGHT_CHEEK} />
+        </clipPath>
+        <linearGradient
+          id="studio-panel-fillet-shade"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="22.38"
+          x2="0"
+          y2="75.05"
+        >
+          <stop offset="0%" stopColor="#81776A" stopOpacity="0.04" />
+          <stop offset="24%" stopColor="#81776A" stopOpacity="0.12" />
+          <stop offset="78%" stopColor="#81776A" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="#635B50" stopOpacity="0.22" />
+        </linearGradient>
+        <linearGradient
+          id="studio-left-fillet-light"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="22.38"
+          x2="0"
+          y2="75.05"
+        >
+          <stop offset="0%" stopColor="#FFFDFA" stopOpacity="0.8" />
+          <stop offset="48%" stopColor="#FFFDFA" stopOpacity="0.75" />
+          <stop offset="79%" stopColor="#F8F3E9" stopOpacity="0.52" />
+          <stop offset="100%" stopColor="#D7CFC2" stopOpacity="0.18" />
+        </linearGradient>
+        <linearGradient
+          id="studio-right-fillet-light"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="22.38"
+          x2="0"
+          y2="75.05"
+        >
+          <stop offset="0%" stopColor="#F8F4EC" stopOpacity="0.66" />
+          <stop offset="55%" stopColor="#F8F4EC" stopOpacity="0.54" />
+          <stop offset="82%" stopColor="#EEE7DB" stopOpacity="0.36" />
+          <stop offset="100%" stopColor="#C8BEAF" stopOpacity="0.16" />
         </linearGradient>
         <linearGradient
           id="studio-shoulder-light"
@@ -423,14 +505,112 @@ export default function MiniBody({ counter }) {
           <stop offset="35%" stopColor="#807C75" />
           <stop offset="100%" stopColor="#45423D" />
         </radialGradient>
+        {/* Hand-tuned depth over the Quiver lighting: shell thickness, edge
+            falloff, a bevel that catches the key light, and a soft sheen. */}
+        <linearGradient id="body-side" x1="0" y1="0" x2="0.35" y2="1">
+          <stop offset="0" stopColor="#B9B3A9" />
+          <stop offset="1" stopColor="#8F897F" />
+        </linearGradient>
+        <radialGradient
+          id="body-falloff"
+          gradientUnits="userSpaceOnUse"
+          cx="38"
+          cy="30"
+          r="40"
+          gradientTransform="translate(38 30) scale(1 1.35) translate(-38 -30)"
+        >
+          <stop offset="0.62" stopColor="#4A453D" stopOpacity="0" />
+          <stop offset="0.88" stopColor="#4A453D" stopOpacity="0.1" />
+          <stop offset="1" stopColor="#4A453D" stopOpacity="0.24" />
+        </radialGradient>
+        <linearGradient
+          id="body-bevel"
+          gradientUnits="userSpaceOnUse"
+          x1="10"
+          y1="5"
+          x2="70"
+          y2="75"
+        >
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.95" />
+          <stop offset="0.45" stopColor="#FFFFFF" stopOpacity="0.35" />
+          <stop offset="0.7" stopColor="#6E685F" stopOpacity="0.12" />
+          <stop offset="1" stopColor="#6E685F" stopOpacity="0.45" />
+        </linearGradient>
+        <radialGradient
+          id="body-sheen"
+          gradientUnits="userSpaceOnUse"
+          cx="27"
+          cy="14"
+          r="20"
+          gradientTransform="translate(27 14) rotate(-12) scale(1.5 0.55) translate(-27 -14)"
+        >
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.55" />
+          <stop offset="0.6" stopColor="#FFFFFF" stopOpacity="0.14" />
+          <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+        </radialGradient>
+        {/* The top face, seen in slight perspective: the brightest plane. */}
+        <linearGradient
+          id="body-top"
+          gradientUnits="userSpaceOnUse"
+          x1="10"
+          y1="0"
+          x2="70"
+          y2="0"
+        >
+          <stop offset="0" stopColor="#FFFFFF" />
+          <stop offset="0.5" stopColor="#F7F5F0" />
+          <stop offset="1" stopColor="#E3DFD7" />
+        </linearGradient>
+        <linearGradient
+          id="body-crease"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="4.9"
+          x2="0"
+          y2="24"
+        >
+          <stop offset="0" stopColor="#8E887E" stopOpacity="0.55" />
+          <stop offset="0.75" stopColor="#8E887E" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#8E887E" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient
+          id="shoulder-lit"
+          gradientUnits="userSpaceOnUse"
+          cx="13"
+          cy="13"
+          r="10"
+        >
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.45" />
+          <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient
+          id="shoulder-shade"
+          gradientUnits="userSpaceOnUse"
+          cx="67"
+          cy="13"
+          r="10"
+        >
+          <stop offset="0" stopColor="#4A453D" stopOpacity="0.12" />
+          <stop offset="1" stopColor="#4A453D" stopOpacity="0" />
+        </radialGradient>
+        <clipPath id="body-shell">
+          <path d={SHELL} />
+        </clipPath>
       </defs>
       <g clipPath="url(#clear-apertures)">
         <g id="body">
+          <path d={SHELL} fill="url(#body-top)" transform="translate(0 -1.5)" />
+          <path
+            d={SHELL}
+            fill="url(#body-side)"
+            transform="translate(0.25 0.55)"
+          />
           <path d={SHELL} fill="url(#studio-body-key)" />
           <path d={SHELL} fill="url(#studio-body-rim)" />
           <path d={SHELL} fill="url(#studio-body-occlusion)" />
           <path d={LEFT_CHEEK} fill="url(#studio-left-panel)" />
           <path d={LEFT_CHEEK} fill="url(#studio-left-edge)" />
+          <Fillet clip="left-cheek" seam={LEFT_SEAM} light="studio-left-fillet-light" />
           <path d={RIGHT_CHEEK} fill="url(#studio-right-panel)" />
           <path
             d="m18.09 10.66c-1.9 0.91-3.37 6.88-3.38 10.61-0.01 1.62 2.06 1.77 2.06-0.14 0-3.91 0.66-7.8 1.71-9.94 0.17-0.36-0.09-0.65-0.39-0.53z"
@@ -448,6 +628,11 @@ export default function MiniBody({ counter }) {
             opacity="0.25"
           />
           <path d={RIGHT_CHEEK} fill="url(#studio-right-edge)" />
+          <Fillet
+            clip="right-cheek"
+            seam={RIGHT_SEAM}
+            light="studio-right-fillet-light"
+          />
           <path
             d="M10.77 22.36l0.54-4.38c0.39-3.31 1.59-6.2 3.68-8.42l2.91-3.08c1.04-1.03 1.69-1.29 3.55-1.29h37.1c1.86 0 2.51 0.26 3.55 1.29l2.91 3.08c2.09 2.22 3.29 5.11 3.68 8.42l0.54 4.38"
             fill="none"
@@ -462,6 +647,24 @@ export default function MiniBody({ counter }) {
             strokeWidth="0.25"
             strokeLinecap="round"
           />
+          <g clipPath="url(#body-shell)">
+            <path d={SHELL} fill="url(#body-falloff)" />
+            <path d={SHELL} fill="url(#body-sheen)" />
+            <path
+              d={SHELL}
+              fill="none"
+              stroke="url(#body-bevel)"
+              strokeWidth="0.9"
+            />
+            <path d={SHELL} fill="url(#shoulder-lit)" />
+            <path d={SHELL} fill="url(#shoulder-shade)" />
+            <path
+              d={SHELL}
+              fill="none"
+              stroke="url(#body-crease)"
+              strokeWidth="0.35"
+            />
+          </g>
         </g>
         <g id="print-slot">
           <rect
