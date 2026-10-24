@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
-// Share of the scroll spent pulling the print out of the slot. The rest
+// Share of the reveal spent pulling the print out of the slot. The rest
 // carries the camera away and lifts the print to fill the screen.
 const PULL_SHARE = 0.55;
 const PEEK_PX = 7;
-// While the page rests at the top, the print edges out a little now and
-// then to show it can be pulled.
+// While the camera rests, the print edges out a little now and then to
+// show it can be pulled.
 const NUDGE_PX = 9;
 const NUDGE_MS = 900;
 const NUDGE_EVERY_MS = 4200;
@@ -25,8 +25,7 @@ function smoothstep(from, to, value) {
   return t * t * (3 - 2 * t);
 }
 
-export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
-  const trackRef = useRef(null);
+export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef }) {
   const anchorRef = useRef(null);
   const cameraRef = useRef(null);
   const printRef = useRef(null);
@@ -34,23 +33,15 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
   const developRef = useRef(null);
   const frameRef = useRef(0);
   const nudgeRef = useRef(0);
-  const progressRef = useRef(0);
-
-  const travel = useCallback(() => {
-    const track = trackRef.current;
-    return track ? Math.max(1, track.offsetHeight - window.innerHeight) : 1;
-  }, []);
 
   const update = useCallback(() => {
     frameRef.current = 0;
-    const track = trackRef.current;
     const anchor = anchorRef.current;
     const camera = cameraRef.current;
     const print = printRef.current;
-    if (!track || !anchor || !camera) return;
+    if (!anchor || !camera) return;
 
-    const p = enabled ? clamp01(-track.getBoundingClientRect().top / travel()) : 0;
-    progressRef.current = p;
+    const p = enabled ? clamp01(progressRef.current) : 0;
     if (!print) {
       camera.style.transform = '';
       camera.style.opacity = '';
@@ -114,7 +105,7 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
     if (developRef.current) {
       developRef.current.style.opacity = String(1 - smoothstep(0.08, 0.92, p));
     }
-  }, [enabled, reduceMotion, slot, travel]);
+  }, [enabled, progressRef, reduceMotion, slot]);
 
   const schedule = useCallback(() => {
     if (!frameRef.current) frameRef.current = requestAnimationFrame(update);
@@ -126,10 +117,8 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
   }, [update, resetKey]);
 
   useEffect(() => {
-    window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
     return () => {
-      window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
       cancelAnimationFrame(frameRef.current);
       frameRef.current = 0;
@@ -156,18 +145,7 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot }) {
       cancelAnimationFrame(raf);
       nudgeRef.current = 0;
     };
-  }, [enabled, reduceMotion, update]);
+  }, [enabled, progressRef, reduceMotion, update]);
 
-  const scrollToShare = useCallback(
-    (share) => {
-      const top = (trackRef.current?.offsetTop ?? 0) + travel() * share;
-      window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
-    },
-    [reduceMotion, travel],
-  );
-
-  const release = useCallback(() => scrollToShare(1), [scrollToShare]);
-  const retract = useCallback(() => scrollToShare(0), [scrollToShare]);
-
-  return { trackRef, anchorRef, cameraRef, printRef, scrollRef, developRef, release, retract };
+  return { anchorRef, cameraRef, printRef, scrollRef, developRef, schedule };
 }

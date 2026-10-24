@@ -53,6 +53,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  overscroll-behavior: none;
   padding: clamp(1.25rem, 6vw, 3rem);
   scrollbar-width: none;
 }
