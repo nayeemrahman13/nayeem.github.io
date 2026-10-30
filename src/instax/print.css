@@ -117,16 +117,14 @@
   position: absolute;
   right: 0;
   bottom: clamp(0.5rem, 2svh, 0.9rem);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35em;
-  padding: 0.35rem 0.5rem;
-  border-radius: 0.4rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
   font-family: var(--engrave);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 0.8rem;
   color: var(--ink-soft);
   opacity: 0;
   pointer-events: none;
@@ -135,7 +133,7 @@
 
 .print-back::before {
   content: '↑';
-  font-size: 1.2em;
+  font-size: 1.4em;
   line-height: 1;
 }
 
