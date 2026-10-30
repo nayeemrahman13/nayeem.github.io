@@ -34,13 +34,12 @@ export default function Print({ stop, printRef, scrollRef, developRef, onFocus, 
         <button
           type="button"
           className="print-back"
+          aria-label="Back to camera"
           onClick={(event) => {
             event.stopPropagation();
             onBack();
           }}
-        >
-          Back to camera
-        </button>
+        />
       </footer>
     </article>
   );
