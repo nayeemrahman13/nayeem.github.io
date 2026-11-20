@@ -6,8 +6,6 @@ function pct(value) {
 // are HTML layered over the drawing, positioned as fractions of its box.
 function describe({ box, lens, slot, shutter }) {
   return {
-    box,
-    lens,
     vars: {
       '--lens-left': pct((lens.cx - lens.r - box.x) / box.w),
       '--lens-top': pct((lens.cy - lens.r - box.y) / box.h),

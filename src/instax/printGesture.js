@@ -2,9 +2,9 @@
 // burst plays the print out. The pose eases the lift itself, so progress
 // moves linearly in time. Easing it again would rush the pull and soften
 // the landing twice.
-export const COMMIT_PX = 64;
-export const BURST_MS = 180;
-export const FULL_MS = 720;
+const COMMIT_PX = 64;
+const BURST_MS = 180;
+const FULL_MS = 720;
 const MIN_MS = 200;
 
 export function createGesture() {

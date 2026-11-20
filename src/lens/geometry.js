@@ -1,6 +1,6 @@
-export const VIEWBOX = 100;
-export const CX = 50;
-export const CY = 50;
+const VIEWBOX = 100;
+const CX = 50;
+const CY = 50;
 
 // Every radius the instrument uses, in viewBox units from the center.
 // Layers must derive from this: painted rings, engraved ticks, type
@@ -74,7 +74,7 @@ export function radialLine(angleDeg, rFrom, rTo) {
 
 // Percentage inset from the lens edge for a given radius, so CSS boxes
 // (viewfinder, iris) land on the same circles as the SVG layers.
-export function insetPercent(radius) {
+function insetPercent(radius) {
   return `${(((VIEWBOX / 2 - radius) / VIEWBOX) * 100).toFixed(3)}%`;
 }
 
