@@ -25,7 +25,7 @@ const IrisBlades = memo(function IrisBlades({ closed }) {
   );
 });
 
-function OptionalArt({ className, src, onReady }) {
+function OptionalArt({ className, src }) {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
@@ -33,7 +33,6 @@ function OptionalArt({ className, src, onReady }) {
       className={className}
       src={src}
       alt=""
-      onLoad={() => onReady?.()}
       onError={() => setVisible(false)}
     />
   );
