@@ -13,12 +13,16 @@ export default function InstaxCamera() {
   const { activeStop, reduceMotion, selectStop } = ring;
   const hasPrint = activeStop.id !== 'rest';
   const progressRef = useRef(0);
+  const returnFocus = useCallback(() => {
+    ring.lensRef.current?.focus({ preventScroll: true });
+  }, [ring.lensRef]);
   const { anchorRef, cameraRef, printRef, scrollRef, developRef, schedule } = useRelease({
     enabled: hasPrint,
     reduceMotion,
     resetKey: activeStop.id,
     slot: MINI.slot,
     progressRef,
+    onReturnFocus: returnFocus,
   });
   const { reveal, retract, snap } = usePrintGesture({
     enabled: hasPrint,
@@ -45,12 +49,14 @@ export default function InstaxCamera() {
     retract();
   }, [activeStop.id, hasPrint, reveal, retract, snap]);
 
+  useEffect(() => {
+    document.title =
+      activeStop.id === 'rest' ? 'Nayeem Rahman' : `${activeStop.label} · Nayeem Rahman`;
+  }, [activeStop]);
+
   const putBack = useCallback(() => {
-    if (printRef.current?.contains(document.activeElement)) {
-      ring.lensRef.current?.focus({ preventScroll: true });
-    }
-    retract();
-  }, [printRef, retract, ring.lensRef]);
+    if (progressRef.current > 0) retract();
+  }, [retract]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -94,7 +100,7 @@ export default function InstaxCamera() {
         ))}
       </nav>
 
-      <section className="release-track">
+      <main className="release-track">
         <div className="release-stage">
           <div className="camera-anchor" ref={anchorRef} style={MINI.vars}>
             <div className="camera" ref={cameraRef}>
@@ -115,7 +121,7 @@ export default function InstaxCamera() {
             onBack={putBack}
           />
         </div>
-      </section>
+      </main>
 
       {flashKey > 0 ? <div key={flashKey} className="flash-burst" aria-hidden="true" /> : null}
     </div>

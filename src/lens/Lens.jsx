@@ -70,7 +70,9 @@ export default function Lens({ ring, onOpen }) {
       ref={lensRef}
       style={CSS_VARS}
       data-dragging={dragging}
-      aria-label="Zoom ring. Use arrow keys or drag to choose a topic."
+      role="group"
+      aria-label="Zoom ring"
+      aria-description="Use arrow keys or drag to choose a topic."
       {...lensProps}
       onPointerDown={(event) => {
         if (event.target.closest('.viewfinder')) return;

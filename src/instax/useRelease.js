@@ -25,7 +25,7 @@ function smoothstep(from, to, value) {
   return t * t * (3 - 2 * t);
 }
 
-export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef }) {
+export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef, onReturnFocus }) {
   const anchorRef = useRef(null);
   const cameraRef = useRef(null);
   const printRef = useRef(null);
@@ -33,6 +33,8 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef 
   const developRef = useRef(null);
   const frameRef = useRef(0);
   const nudgeRef = useRef(0);
+  const onReturnFocusRef = useRef(onReturnFocus);
+  onReturnFocusRef.current = onReturnFocus;
 
   const update = useCallback(() => {
     frameRef.current = 0;
@@ -43,14 +45,31 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef 
 
     const p = enabled ? clamp01(progressRef.current) : 0;
     if (!print) {
+      camera.inert = false;
+      camera.dataset.away = 'false';
       camera.style.transform = '';
       camera.style.opacity = '';
       return;
     }
 
     const out = p >= OUT_AT;
+    const wasOut = print.dataset.out === 'true';
+    const focusInCamera = out && !wasOut && camera.contains(document.activeElement);
+    const shouldReturnFocus =
+      !out &&
+      wasOut &&
+      (print.contains(document.activeElement) || document.activeElement === document.body);
     print.dataset.out = String(out);
     camera.dataset.away = String(out);
+    camera.inert = out;
+    if (focusInCamera) {
+      scrollRef.current?.focus({ preventScroll: true });
+    } else if (shouldReturnFocus) {
+      onReturnFocusRef.current?.();
+    }
+    if (p === 0 && scrollRef.current && scrollRef.current.scrollTop > 0) {
+      scrollRef.current.scrollTop = 0;
+    }
 
     if (reduceMotion) {
       const shown = smoothstep(0.2, 0.8, p);
@@ -73,6 +92,7 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef 
     const finalLeft = print.offsetLeft;
     const finalTop = print.offsetTop;
     const finalW = print.offsetWidth;
+    if (!finalW) return;
     const smallW = cam.width * slot.w * PRINT_TO_SLOT;
     const startScale = smallW / finalW;
     const smallH = print.offsetHeight * startScale;
@@ -132,6 +152,10 @@ export function useRelease({ enabled, reduceMotion, resetKey, slot, progressRef 
       if (progressRef.current > 0 || document.hidden) return;
       const start = performance.now();
       const step = (now) => {
+        if (progressRef.current > 0) {
+          nudgeRef.current = 0;
+          return;
+        }
         const t = Math.min(1, (now - start) / NUDGE_MS);
         nudgeRef.current = NUDGE_PX * Math.sin(Math.PI * t) ** 2;
         update();
