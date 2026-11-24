@@ -1,3 +1,27 @@
+@property --fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes reveal-fade-start {
+  to {
+    --fade-start: var(--fade-size);
+  }
+}
+
+@keyframes hide-fade-end {
+  from {
+    --fade-end: var(--fade-size);
+  }
+}
+
 /* The print is always laid out at its full-screen size. useRelease scales
    it down from the top-left corner to sit in the camera's slot. */
 .print {
@@ -50,20 +74,33 @@
 }
 
 .print-scroll {
+  --fade-size: 2.25rem;
   position: absolute;
   inset: 0;
   overflow: hidden;
   overscroll-behavior: none;
   padding: clamp(1.25rem, 6vw, 3rem);
+  padding-bottom: clamp(2.5rem, 7vw, 3.6rem);
+  scroll-padding-block: var(--fade-size);
   scrollbar-width: none;
-}
-
-.print-scroll::-webkit-scrollbar {
-  display: none;
 }
 
 .print[data-out='true'] .print-scroll {
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 28, 26, 0.24) transparent;
+}
+
+@supports (animation-timeline: scroll()) {
+  .print[data-out='true'] .print-scroll {
+    mask:
+      linear-gradient(black, black) no-clip subtract,
+      linear-gradient(to bottom, black, transparent) 0 0 / 100% var(--fade-start) no-repeat no-clip,
+      linear-gradient(to bottom, transparent, black) 0 100% / 100% var(--fade-end) no-repeat no-clip;
+    animation: reveal-fade-start linear both, hide-fade-end linear both;
+    animation-timeline: scroll(self block);
+    animation-range: 0 var(--fade-size), calc(100% - var(--fade-size)) 100%;
+  }
 }
 
 .print-scroll > * {
@@ -110,6 +147,7 @@
   position: relative;
   display: grid;
   place-items: center;
+  padding-inline: 2.75rem;
   height: clamp(4.25rem, 13svh, 7.5rem);
 }
 
@@ -187,10 +225,19 @@
 .print-name {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.42rem;
   font-size: clamp(1.2rem, 4.2vw, 1.5rem);
   font-weight: 600;
   letter-spacing: -0.035em;
+}
+
+.project-icon {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  pointer-events: none;
+  color: var(--ink-soft);
+  transition: color 160ms ease;
 }
 
 .print-link {
@@ -280,11 +327,19 @@
 
 @media (hover: hover) and (pointer: fine) {
   .print-link:hover,
+  .print-link:hover .project-icon,
   .print-email:hover {
     color: var(--accent);
   }
 
   .print-back:hover {
     background: var(--line);
+  }
+}
+
+@media (pointer: coarse) {
+  .print-back {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }

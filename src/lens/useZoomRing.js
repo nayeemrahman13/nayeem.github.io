@@ -62,17 +62,18 @@ function syncHash(stop) {
 }
 
 export function useZoomRing() {
+  const initialStop = stopFromHash(window.location.hash);
   const lensRef = useRef(null);
   const dragRef = useRef(null);
   const springRef = useRef(null);
   const wheelTimer = useRef(null);
-  const rotationRef = useRef(rotationForStop(STOPS[0]));
+  const rotationRef = useRef(rotationForStop(initialStop));
   const skipHash = useRef(false);
   const didDragRef = useRef(false);
 
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [rotation, setRotation] = useState(() => rotationForStop(STOPS[0]));
-  const [activeStop, setActiveStop] = useState(STOPS[0]);
+  const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
+  const [rotation, setRotation] = useState(() => rotationForStop(initialStop));
+  const [activeStop, setActiveStop] = useState(initialStop);
   const [dragging, setDragging] = useState(false);
 
   const setRotationNow = useCallback((value) => {
@@ -138,11 +139,11 @@ export function useZoomRing() {
         skipHash.current = false;
         return;
       }
-      const stop = stopFromHash(window.location.hash);
-      commitStop(stop, { snap: false });
+      const { hash } = window.location;
+      if (hash && !STOPS.some((item) => item.hash === hash)) return;
+      commitStop(stopFromHash(hash), { snap: false });
     };
 
-    applyHash();
     window.addEventListener('hashchange', applyHash);
     return () => window.removeEventListener('hashchange', applyHash);
   }, [commitStop]);

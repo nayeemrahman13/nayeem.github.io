@@ -1,4 +1,5 @@
 import { about, photos, projects } from '../lens/content';
+import ProjectIcon from './ProjectIcon';
 
 function About() {
   return <p className="print-lede">{about}</p>;
@@ -6,7 +7,7 @@ function About() {
 
 function Work() {
   return (
-    <ol className="print-list">
+    <ol className="print-list" role="list">
       {projects.map((project) => {
         const Title = project.href ? 'a' : 'span';
         const titleProps = project.href
@@ -15,7 +16,8 @@ function Work() {
         return (
           <li key={project.name}>
             <Title className={project.href ? 'print-link' : 'print-name'} {...titleProps}>
-              {project.name}
+              <ProjectIcon name={project.icon} />
+              <span>{project.name}</span>
             </Title>
             <p>{project.description}</p>
           </li>
@@ -28,7 +30,7 @@ function Work() {
 // Placeholder prints until the real photos are in.
 function Photos() {
   return (
-    <ul className="print-photos">
+    <ul className="print-photos" role="list">
       {photos.map((photo) => (
         <li key={photo.place}>
           <figure className="mini-print">

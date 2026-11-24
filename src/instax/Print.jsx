@@ -17,7 +17,7 @@ export default function Print({ stop, printRef, scrollRef, developRef, onFocus, 
     >
       <div className="print-lift" aria-hidden="true" />
       <div className="print-photo">
-        <div className="print-scroll" ref={scrollRef}>
+        <div className="print-scroll" ref={scrollRef} tabIndex={-1}>
           <PrintContent stop={stop} />
         </div>
         <p className="print-stamp" aria-hidden="true">

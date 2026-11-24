@@ -13,19 +13,43 @@ export const about =
 
 export const projects = [
   {
+    name: 'Doe',
+    icon: 'doe',
+    href: 'https://usedoe.tech',
+    description:
+      'A Mac app that explains whatever you highlight, in any app, with sources you can check.',
+  },
+  {
+    name: 'NBA Scores',
+    icon: 'basketball',
+    href: 'https://github.com/nayeemrahman13/nba-score-track-mac',
+    description: 'A menu-bar app for live NBA scores and league leaders.',
+  },
+  {
+    name: 'Voice IVR',
+    icon: 'keypad',
+    href: 'https://github.com/nayeemrahman13/voice-ivr',
+    description: 'A phone menu that listens, picks the right scripted line, and never improvises.',
+  },
+  {
+    name: 'Where’s Walk Club',
+    icon: 'pin',
+    href: 'https://wheres-walk-club.vercel.app',
+    description: 'A live map so even the late ones can find walk club while it’s still going.',
+  },
+  {
+    name: 'JeVAD',
+    icon: 'wave',
+    href: 'https://github.com/nayeemrahman13/JeVAD',
+    description:
+      'A real-time voice agent experiment in knowing when to stop talking and let you cut in.',
+  },
+  {
     name: 'Reston',
+    icon: 'reflect',
     href: 'https://reston-nayeemrahman13.replit.app/',
     description:
       'Voice AI that helps people get more out of therapy, in the hours between sessions.',
-  },
-  {
-    name: 'Voice agent',
-    href: 'https://regal-voice-ai-agent-nayeemrahman13.replit.app/',
-    description: 'A customer-support agent that can speak like Yoda, if you know where to look.',
-  },
-  {
-    name: 'Resume agent',
-    description: 'Chat with my resume to find out what I’ve done.',
   },
 ];
 
